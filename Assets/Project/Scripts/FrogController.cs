@@ -6,9 +6,9 @@ using UnityEngine;
 
 public class FrogController : MonoBehaviour
 {
+    [SerializeField] private float chargeMultiplier;
     [SerializeField] private float maxJumpCharge;
-
-    private float jumpCharge;
+    [SerializeField] private float jumpAngle;
 
     private Vector3 jumpDirection;
 
@@ -24,7 +24,7 @@ public class FrogController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         chargeStart = Vector3.zero;
-        chargeEnd = Vector3.zero + Vector3.back;
+        chargeEnd = Vector3.zero + Vector3.left;
     }
 
     public void ReceiveTargetInput(Vector3 mouseWorldPosition)
@@ -41,20 +41,20 @@ public class FrogController : MonoBehaviour
 
         if (chargeStart - chargeEnd != Vector3.zero)
         {
-            jumpDirection = chargeStart - chargeEnd;
+            jumpDirection = (chargeStart - chargeEnd) * chargeMultiplier;
 
             if(jumpDirection.sqrMagnitude > maxJumpCharge * maxJumpCharge)
             {
                 jumpDirection = jumpDirection.normalized * maxJumpCharge;
             }
 
-            rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, 45 * Mathf.Deg2Rad, 0);
+            rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
         }
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && IsGrounded())
         {
             rb.velocity = rotatedVector;
         }
@@ -67,10 +67,15 @@ public class FrogController : MonoBehaviour
     private void OnDrawGizmos()
     {
         var pos = transform.position;
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(pos, pos + transform.forward);
-
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(pos, pos + rotatedVector.normalized);
+    }
+
+    private bool IsGrounded()
+    {
+        if(Physics.CheckSphere(transform.position, 0.01f))
+            return true;
+
+        return false;
     }
 }
