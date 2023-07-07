@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 5, y: 20, z: 0}
+  m_FollowOffset: {x: 5, y: 5.9, z: 0}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -422,7 +422,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 733132618}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: c62239d34204b1347bf308df77a9add1, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -514,7 +514,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 775625840}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: ea9a13910e0171e408f8242b184c63cd, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -657,8 +657,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 850847084}
-  m_LocalRotation: {x: 0.43516213, y: -0.55734545, z: 0.43516213, w: 0.5573455}
-  m_LocalPosition: {x: 5, y: 20, z: 0}
+  m_LocalRotation: {x: 0.2972702, y: -0.64158434, z: 0.29727018, w: 0.64158434}
+  m_LocalPosition: {x: 5, y: 5.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -752,8 +752,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.43516213, y: -0.55734545, z: 0.43516213, w: 0.5573455}
-  m_LocalPosition: {x: 5, y: 20, z: 0}
+  m_LocalRotation: {x: 0.2972702, y: -0.64158434, z: 0.29727018, w: 0.64158434}
+  m_LocalPosition: {x: 5, y: 5.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -848,6 +848,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1048060658}
   - component: {fileID: 1048060659}
+  - component: {fileID: 1048060660}
   m_Layer: 0
   m_Name: Car
   m_TagString: Untagged
@@ -883,4 +884,81 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49dff491c1b884643bcf63151af56a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 1
+  turnSpeed: 100
+  topSpeed: 5
+  acceleration: 10
+  turnPIDX:
+    proportionalGain: 1
+    integralGain: 0.1
+    derivativeGain: 0.35
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 1
+    derivativeMeasurement: 0
+    valueLast: 0
+    errorLast: 0
+    integrationStored: 0
+    derivativeInitialized: 0
+  turnPIDY:
+    proportionalGain: 1
+    integralGain: 0.1
+    derivativeGain: 0.2
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 1
+    derivativeMeasurement: 0
+    valueLast: 0
+    errorLast: 0
+    integrationStored: 0
+    derivativeInitialized: 0
+  turnPIDZ:
+    proportionalGain: 1
+    integralGain: 0.1
+    derivativeGain: 0.35
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 1
+    derivativeMeasurement: 0
+    valueLast: 0
+    errorLast: 0
+    integrationStored: 0
+    derivativeInitialized: 0
+  speedPID:
+    proportionalGain: 1
+    integralGain: 0.1
+    derivativeGain: 0.35
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 0.01
+    derivativeMeasurement: 1
+    valueLast: 0
+    errorLast: 0
+    integrationStored: 0
+    derivativeInitialized: 0
+--- !u!54 &1048060660
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048060657}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 80
+  m_CollisionDetection: 0
