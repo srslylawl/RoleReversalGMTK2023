@@ -8,8 +8,9 @@ public class InputManager : MonoBehaviour {
 
 
 	public CarController CarController;
-	
-	private void Awake() {
+    public FrogController FrogController;
+
+    private void Awake() {
 		cam = Camera.main;
 	}
 
@@ -27,8 +28,9 @@ public class InputManager : MonoBehaviour {
 
 		mouseWorldPos = intersectionPoint;
 		
-		CarController.ReceiveTargetInput(mouseWorldPos);
-	}
+		CarController?.ReceiveTargetInput(mouseWorldPos);
+        FrogController?.ReceiveTargetInput(mouseWorldPos);
+    }
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.green;
