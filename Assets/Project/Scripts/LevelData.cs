@@ -1,17 +1,15 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu]
-public class LevelData : ScriptableObject {
+[Serializable]
+public class LevelData {
 	public CarLevelData[] CarLevelDatas;
-	// public 
 }
 
 
 [Serializable]
 public struct CarLevelData {
 	public GameObject CarPrefab;
-	public Vector3 SpawnPoint;
-	public Vector3 SpawnRotation;
-	public int GoalPointID;
+	public SpawnPoint SpawnPoint;
+	public GoalPoint GoalPoint;
 }

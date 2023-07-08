@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TurnSpeed: 150
   TopSpeed: 30
-  Acceleration: 10
+  Acceleration: 20
   Grip: 5
   MaxTiltAngle: 35
   MaxTiltPerSecond: 20
@@ -28,6 +28,6 @@ MonoBehaviour:
     integralSaturation: 0.01
     derivativeMeasurement: 0
     valueLast: 0
-    errorLast: 0.00046654083
-    integrationStored: -0.0036587513
+    errorLast: -7.1118195e-10
+    integrationStored: 0.008931751
     derivativeInitialized: 1

@@ -2,6 +2,29 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public class Score {
+	public int TotalFrogAmount;
+	public int CurrentFrogsKilled;
+	public int TotalLives;
+	public int RemainingLives;
+
+	public float SecondsRemaining;
+
+	public int CalculateScore() {
+		//each frog killed adds 100 to score
+		int score = CurrentFrogsKilled * 100;
+		
+		//each remaining car live adds 200 to score;
+		score += RemainingLives * 200;
+		
+		//each second remaining adds 10 to score;
+		score += (int)(SecondsRemaining * 10);
+
+		return score;
+	}
+}
+
 public class GameStateManager : MonoBehaviour {
 	[SerializeField] private InputManager InputManager;
 	[SerializeField] private LevelData levelData;
@@ -10,6 +33,8 @@ public class GameStateManager : MonoBehaviour {
 	private List<FrogTimeData> frogTimeData = new List<FrogTimeData>();
 
 	private CarTimeData activeCarTimeData;
+
+	[SerializeField] private Score CurrentScore = new Score();
 
 	enum GameMode {
 		Frog,
@@ -97,12 +122,12 @@ public class GameStateManager : MonoBehaviour {
 		CurrentTick = 0;
 	}
 
-	private void SetActiveGoalPoint(int id) {
+	private void SetActiveGoalPoint(GoalPoint goalPoint) {
 		if (activeGoalPoint != null) {
 			activeGoalPoint.OnGoalReached = null;
 		}
 
-		activeGoalPoint = GoalPoint.goalPoints[id];
+		activeGoalPoint = goalPoint;
 		activeGoalPoint.OnGoalReached = OnGoalReachedCallBack;
 	}
 
@@ -119,6 +144,32 @@ public class GameStateManager : MonoBehaviour {
 				}
 			}
 		}
+	}
+	private void OnCrashCallBack(CarController car) {
+		if (currentMode != GameMode.Car) {
+			throw new Exception("Car crash callback while in frog mode????");
+		}
+
+		if (car != activeCarTimeData.Car)
+			throw new Exception("Car crash called with inactive car");
+
+
+		if (CurrentScore.RemainingLives == 0) {
+			//TODO: GAME OVER - OUT OF LIVES
+		}
+		
+		CurrentScore.RemainingLives--;
+		
+		//TODO: UPDATE CAR LIVES UI
+		
+		EndRound();
+	}
+
+	private void OnRunOverFrogCallBack(FrogController frog) {
+		//Make sure frog has not been killed already
+		CurrentScore.CurrentFrogsKilled++;
+		
+		//if all frogs have been killed, display score!
 	}
 
 	private void Update() {
@@ -140,11 +191,12 @@ public class GameStateManager : MonoBehaviour {
 			}
 
 			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
-			var carObject = Instantiate(currentData.CarPrefab, currentData.SpawnPoint, Quaternion.Euler(currentData.SpawnRotation));
+			var spTF = currentData.SpawnPoint.transform;
+			var carObject = Instantiate(currentData.CarPrefab, spTF.position, spTF.rotation);
 			activeCarTimeData = new CarTimeData(carObject.GetComponent<CarController>());
 			InputManager.SetCarController(activeCarTimeData.Car);
 			activeCarTimeData.Car.SetMode(false, activeCarTimeData);
-			SetActiveGoalPoint(currentData.GoalPointID);
+			SetActiveGoalPoint(currentData.GoalPoint);
 			//spawn new car
 		}
 
