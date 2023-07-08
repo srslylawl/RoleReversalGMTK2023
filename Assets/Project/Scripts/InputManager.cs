@@ -9,6 +9,8 @@ public class InputManager : MonoBehaviour {
 	private CarController CarController;
     public FrogController FrogController;
 
+	public bool UpdateControllers;
+
     private void Awake() {
 		cam = Camera.main;
 	}
@@ -20,9 +22,20 @@ public class InputManager : MonoBehaviour {
 
 		CarController = controller;
 	}
+	
+	public void SetFrogController(FrogController controller) {
+		if (FrogController != null) {
+			FrogController.ReceiveInputHeld(false);
+		}
+
+		FrogController = controller;
+	}
 
 
 	private void Update() {
+		if (!UpdateControllers) {
+			return;
+		}
 		var screenPos = Input.mousePosition;
 		var ray = cam.ScreenPointToRay(screenPos);
 		// Define the plane
@@ -36,10 +49,14 @@ public class InputManager : MonoBehaviour {
 		mouseWorldPos = intersectionPoint;
 
 		var inputHeld = Input.GetMouseButton(0);
+		var inputUp = Input.GetMouseButtonUp(0);
 		
 		CarController?.ReceiveTargetInput(mouseWorldPos);
 		CarController?.ReceiveInputHeld(inputHeld);
         FrogController?.ReceiveTargetInput(mouseWorldPos);
+		FrogController?.ReceiveInputHeld(inputHeld);
+		
+		if (inputUp) FrogController?.ReceiveInputUp(true);
     }
 
 	private void OnDrawGizmos() {

@@ -132,7 +132,7 @@ Transform:
   - {fileID: -8679921383154817045}
   - {fileID: 6953619290645736123}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1957505515920820695
 MonoBehaviour:
@@ -148,8 +148,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   splatFrog: {fileID: 1083600859461223724, guid: 0f1fd590dc3082944b27dec720eabddb, type: 3}
   arrow: {fileID: 1819310559029432125}
-  chargeMultiplier: 3
-  maxJumpCharge: 8
+  chargeMultiplier: 1
+  maxJumpCharge: 3
   jumpAngle: 30
 --- !u!54 &6205974558321399442
 Rigidbody:
@@ -175,9 +175,9 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 80
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!1 &721807077825797695
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,8 +235,8 @@ Transform:
   m_GameObject: {fileID: 919132149155446097}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: -720356593241213320}
   - {fileID: -8965811294570246362}
@@ -289,8 +289,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1801869278568603123}
   m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.5}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6953619290645736123}
@@ -389,7 +389,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4242986804316673644}
-  - component: {fileID: 5446244259929612470}
   m_Layer: 9
   m_Name: Mesh
   m_TagString: Frog
@@ -412,27 +411,6 @@ Transform:
   m_Father: {fileID: 8174426443422412552}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &5446244259929612470
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3525620178844668400}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 0.3, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3678075426543655659
 GameObject:
   m_ObjectHideFlags: 0
@@ -505,6 +483,7 @@ GameObject:
   m_Component:
   - component: {fileID: -720356593241213320}
   - component: {fileID: -7281404783259044272}
+  - component: {fileID: 2375688040607440123}
   m_Layer: 0
   m_Name: FrogShape
   m_TagString: Untagged
@@ -588,3 +567,25 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.59736466, y: -0.19968814, z: 0.026757598}
     m_Extent: {x: 1.3357006, y: 0.29241556, z: 1.2808098}
   m_DirtyAABB: 0
+--- !u!64 &2375688040607440123
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6965460090217781184}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 2039885468501035741, guid: 2cff28adc1d15a743a0a1f513a7cee49, type: 3}

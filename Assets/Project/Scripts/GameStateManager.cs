@@ -33,6 +33,7 @@ public class GameStateManager : MonoBehaviour {
 	private List<FrogTimeData> frogTimeData = new List<FrogTimeData>();
 
 	private CarTimeData activeCarTimeData;
+	private FrogTimeData activeFrogTimeData;
 
 	[SerializeField] private Score CurrentScore = new Score();
 
@@ -49,6 +50,7 @@ public class GameStateManager : MonoBehaviour {
 	private int HighestTick;
 
 	private int CurrentLevelCarIteration;
+	private int CurrentLevelFrogIteration;
 
 	private bool GamePaused = true;
 
@@ -59,6 +61,25 @@ public class GameStateManager : MonoBehaviour {
 
 		switch (currentMode) {
 			case GameMode.Frog:
+				foreach (var timeData in frogTimeData) {
+					if (timeData.TimeDataMode == TimeDataMode.Record) {
+						timeData.TimeData[CurrentTick] = timeData.Frog.GetTimeData();
+					}
+
+					if (timeData.TimeDataMode == TimeDataMode.Replay) {
+						if (timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
+							if (!timeData.Frog.gameObject.activeSelf) {
+								timeData.Frog.gameObject.SetActive(true);
+							}
+
+							timeData.Frog.ApplyTimeData(data);
+						}
+						else {
+							timeData.Frog.gameObject.SetActive(false);
+						}
+					}
+				}
+				activeFrogTimeData.TimeData[CurrentTick] = activeFrogTimeData.Frog.GetTimeData();
 				break;
 			case GameMode.Car:
 				foreach (var timeData in carTimeData) {
@@ -98,6 +119,19 @@ public class GameStateManager : MonoBehaviour {
 				timeData.Car.gameObject.SetActive(false);
 			}
 		}
+		
+		foreach (var timeData in frogTimeData) {
+			if (timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
+				if (!timeData.Frog.gameObject.activeSelf) {
+					timeData.Frog.gameObject.SetActive(true);
+				}
+
+				timeData.Frog.ApplyTimeData(data);
+			}
+			else {
+				timeData.Frog.gameObject.SetActive(false);
+			}
+		}
 
 		CurrentTick++;
 		HighestTick = Math.Max(CurrentTick, HighestTick);
@@ -109,6 +143,18 @@ public class GameStateManager : MonoBehaviour {
 		foreach (var timeData in carTimeData) {
 			timeData.Car.ApplyTimeData(timeData.TimeData[0]);
 
+			if (timeData.TimeDataMode == TimeDataMode.Record) {
+				//make sure to set the rest of the times to the last tick
+				var last = timeData.TimeData[CurrentTick-1];
+				for (int i = CurrentTick; i <= HighestTick; i++) {
+					timeData.TimeData[i] = last;
+				}
+			}
+			timeData.TimeDataMode = TimeDataMode.Replay;
+		}
+		
+		foreach (var timeData in frogTimeData) {
+			timeData.Frog.ApplyTimeData(timeData.TimeData[0]);
 			if (timeData.TimeDataMode == TimeDataMode.Record) {
 				//make sure to set the rest of the times to the last tick
 				var last = timeData.TimeData[CurrentTick-1];
@@ -140,7 +186,18 @@ public class GameStateManager : MonoBehaviour {
 					//TODO: CHECK IF FROG WAS KILLED! - frog needs to be killed to succeed!
 					Debug.Log($"{go} reached the goal!");
 					EndRound();
-					UIManager.StartReadyCountDown("Get to safety!", Next);
+					Next();
+				}
+			}
+		}
+
+		if (currentMode == GameMode.Frog) {
+			if (go.TryGetComponent(out FrogController controller)) {
+				var same = controller == activeFrogTimeData.Frog;
+				if (same) {
+					//GOAL REACHED
+					EndRound();
+					Next();
 				}
 			}
 		}
@@ -173,36 +230,68 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		UIManager.StartReadyCountDown("Ready?", Next);
+		StartFrogMode();
+	}
+
+	private void StartFrogMode() {
+		currentMode = GameMode.Frog;
+		if (levelData.FrogLevelDatas.Length < CurrentLevelFrogIteration - 1) {
+			throw new Exception($"Frog Level Data too small! Current Iteration: {CurrentLevelCarIteration}, Cars: {levelData.CarLevelDatas.Length}");
+		}
+		
+		var currentData = levelData.FrogLevelDatas[CurrentLevelFrogIteration];
+		var spTF = currentData.SpawnPoint.transform;
+		var frogObject = Instantiate(currentData.FrogPrefab, spTF.position, spTF.rotation);
+		activeFrogTimeData = new FrogTimeData(frogObject.GetComponent<FrogController>());
+		InputManager.SetFrogController(activeFrogTimeData.Frog);
+		activeFrogTimeData.TimeDataMode = TimeDataMode.Record;
+		SetActiveGoalPoint(currentData.GoalPoint);
+		
+		UIManager.StartReadyCountDown("Get to safety!", StartRound);
+		CameraScript.AssignFrogTarget(frogObject.transform);
+		CameraScript.SwitchCameras(false);
+
+	}
+
+	private void StartCarMode() {
+		currentMode = GameMode.Car;
+		if (levelData.CarLevelDatas.Length < CurrentLevelCarIteration - 1) {
+			throw new Exception($"Car Level Data too small! Current Iteration: {CurrentLevelCarIteration}, Cars: {levelData.CarLevelDatas.Length}");
+		}
+			
+		//START CAR MODE
+		var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
+		var spTF = currentData.SpawnPoint.transform;
+		var carObject = Instantiate(currentData.CarPrefab, spTF.position, spTF.rotation);
+		activeCarTimeData = new CarTimeData(carObject.GetComponent<CarController>());
+		InputManager.SetCarController(activeCarTimeData.Car);
+		activeCarTimeData.Car.SetMode(false, activeCarTimeData);
+		SetActiveGoalPoint(currentData.GoalPoint);
+		
+		UIManager.StartReadyCountDown("Don't let him escape!", StartRound);
+		CameraScript.SwitchCameras(true);
 	}
 
 	public void Next() {
+		//Change to next mode
 		if (currentMode == GameMode.Car) {
-			if (levelData.CarLevelDatas.Length < CurrentLevelCarIteration - 1) {
-				throw new Exception($"Car Level Data too small! Current Iteration: {CurrentLevelCarIteration}, Cars: {levelData.CarLevelDatas.Length}");
-			}
-
-			
-			//START CAR MODE
-			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
-			var spTF = currentData.SpawnPoint.transform;
-			var carObject = Instantiate(currentData.CarPrefab, spTF.position, spTF.rotation);
-			activeCarTimeData = new CarTimeData(carObject.GetComponent<CarController>());
-			InputManager.SetCarController(activeCarTimeData.Car);
-			activeCarTimeData.Car.SetMode(false, activeCarTimeData);
-			SetActiveGoalPoint(currentData.GoalPoint);
-			//spawn new car
+			StartFrogMode();
 		}
 
-		StartRound();
+		if (currentMode == GameMode.Frog) {
+			StartCarMode();
+		}
+		
 	}
 
 	public void StartRound() {
 		GamePaused = false;
+		InputManager.UpdateControllers = true;
 	}
 
 	public void EndRound() {
 		GamePaused = true;
+		InputManager.UpdateControllers = false;
 		if (currentMode == GameMode.Car) {
 			carTimeData.Add(activeCarTimeData);
 			activeCarTimeData.Car.SetMode(true, activeCarTimeData);
@@ -210,6 +299,16 @@ public class GameStateManager : MonoBehaviour {
 			InputManager.SetCarController(null);
 
 			CurrentLevelCarIteration++;
+		}
+
+		if (currentMode == GameMode.Frog) {
+			frogTimeData.Add(activeFrogTimeData);
+			activeFrogTimeData.TimeDataMode = TimeDataMode.Replay;
+			// activeFrogTimeData = null;
+			InputManager.SetFrogController(null);
+
+			CameraScript.AssignFrogTarget(null);
+			CurrentLevelFrogIteration++;
 		}
 
 		ResetScene();

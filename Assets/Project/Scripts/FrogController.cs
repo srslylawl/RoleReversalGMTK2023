@@ -1,13 +1,8 @@
-using Cinemachine.Utility;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
-using static UnityEngine.LightAnchor;
 
 public class FrogController : MonoBehaviour
 {
-
     [SerializeField] private GameObject splatFrog;
 
     [SerializeField] private GameObject arrow;
@@ -27,6 +22,9 @@ public class FrogController : MonoBehaviour
     private Rigidbody rb;
     private Animator fAnim;
 
+    private bool inputHeld;
+    private bool inputUp;
+
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -36,9 +34,33 @@ public class FrogController : MonoBehaviour
         chargeEnd = transform.position - transform.forward;
     }
 
+    public ObjectTimeData GetTimeData() {
+        return new ObjectTimeData() {
+            AngularVelocity = rb.angularVelocity,
+            Position = rb.position,
+            Rotation = rb.rotation,
+            Velocity = rb.velocity
+        };
+    }
+
+    public void ApplyTimeData(ObjectTimeData timeData) {
+        rb.angularVelocity = timeData.AngularVelocity;
+        rb.position = timeData.Position;
+        rb.rotation = timeData.Rotation;
+        rb.velocity = timeData.Velocity;
+    }
+
+    public void ReceiveInputHeld(bool held) {
+        inputHeld = held;
+    }
+
+    public void ReceiveInputUp(bool up) {
+        inputUp = up;
+    }
+
     public void ReceiveTargetInput(Vector3 mouseWorldPosition)
     {
-        if (Input.GetMouseButton(0) && IsGrounded())
+        if (inputHeld && IsGrounded())
         {
             chargeEnd = mouseWorldPosition;
         }
@@ -56,15 +78,17 @@ public class FrogController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonUp(0) && IsGrounded())
+        if (inputUp && IsGrounded())
         {
             rememberMe = true;
         }
+
+        inputUp = false;
     }
 
     private void FixedUpdate()
     {
-        if (Input.GetMouseButton(0))
+        if (inputHeld)
         {
             var targetRotation = new Vector3(0f, Quaternion.LookRotation(jumpDirection, Vector3.up).eulerAngles.y, 0f);
 
@@ -117,6 +141,7 @@ public class FrogController : MonoBehaviour
     {
         Instantiate(splatFrog, this.transform.position, splatFrog.transform.rotation);
 
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
+        // Destroy(this.gameObject);
     }
 }
