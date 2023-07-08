@@ -107,6 +107,7 @@ public class FrogController : MonoBehaviour, IController
 
     private void FixedUpdate()
     {
+        arrow.transform.localScale = new Vector3(1f, 1f, 0f);
 
         if (charging)
         {
@@ -114,7 +115,7 @@ public class FrogController : MonoBehaviour, IController
 
             chargeTime = Mathf.Clamp(chargeTime + Time.fixedDeltaTime, 0f, maxChargeTime);
 
-            arrow.transform.localScale = new Vector3(1f, 1f, Mathf.Lerp(arrow.transform.localScale.z, (chargeTime/maxChargeTime)*2f, 0.25f));
+            arrow.transform.localScale = new Vector3(1f, 1f, (chargeTime / maxChargeTime) * 2f);
 
             transform.eulerAngles = targetRotation;
         }
