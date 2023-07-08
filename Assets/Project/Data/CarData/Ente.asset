@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ente
   m_EditorClassIdentifier: 
   TurnSpeed: 150
-  TopSpeed: 5
+  TopSpeed: 30
   Acceleration: 10
   Grip: 5
   MaxTiltAngle: 35
@@ -28,6 +28,6 @@ MonoBehaviour:
     integralSaturation: 0.01
     derivativeMeasurement: 0
     valueLast: 0
-    errorLast: -0.00000016410122
-    integrationStored: 0.005724059
+    errorLast: 0.00046654083
+    integrationStored: -0.0036587513
     derivativeInitialized: 1

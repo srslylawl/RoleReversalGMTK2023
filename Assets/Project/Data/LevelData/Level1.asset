@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CarLevelDatas:
   - CarPrefab: {fileID: 7424161845974858522, guid: 13ab0cf82a8b72b4fbdf6e5399698698, type: 3}
-    SpawnPoint: {x: 0, y: 0, z: 0}
-    SpawnRotation: {x: 0, y: 0, z: 0}
+    SpawnPoint: {x: -20, y: 0, z: -0.66}
+    SpawnRotation: {x: 0, y: 90, z: 0}
+    GoalPointID: 1
   - CarPrefab: {fileID: 7424161845974858522, guid: 13ab0cf82a8b72b4fbdf6e5399698698, type: 3}
-    SpawnPoint: {x: -5, y: 0, z: -5}
-    SpawnRotation: {x: 0, y: 0, z: 0}
+    SpawnPoint: {x: 30, y: 0, z: 5}
+    SpawnRotation: {x: 0, y: -90, z: 0}
+    GoalPointID: 2
   - CarPrefab: {fileID: 7424161845974858522, guid: 13ab0cf82a8b72b4fbdf6e5399698698, type: 3}
-    SpawnPoint: {x: 5, y: 0, z: 5}
-    SpawnRotation: {x: 0, y: 0, z: 0}
+    SpawnPoint: {x: 30, y: 0, z: 0}
+    SpawnRotation: {x: 0, y: -90, z: 0}
+    GoalPointID: 3
   - CarPrefab: {fileID: 7424161845974858522, guid: 13ab0cf82a8b72b4fbdf6e5399698698, type: 3}
-    SpawnPoint: {x: 5, y: 0, z: -5}
-    SpawnRotation: {x: 0, y: 0, z: 0}
-  - CarPrefab: {fileID: 7424161845974858522, guid: 13ab0cf82a8b72b4fbdf6e5399698698, type: 3}
-    SpawnPoint: {x: -5, y: 0, z: 5}
-    SpawnRotation: {x: 0, y: 0, z: 0}
+    SpawnPoint: {x: -20, y: 0, z: 4}
+    SpawnRotation: {x: 0, y: 90, z: 0}
+    GoalPointID: 4

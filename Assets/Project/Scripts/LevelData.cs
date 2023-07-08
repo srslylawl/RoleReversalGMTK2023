@@ -13,4 +13,5 @@ public struct CarLevelData {
 	public GameObject CarPrefab;
 	public Vector3 SpawnPoint;
 	public Vector3 SpawnRotation;
+	public int GoalPointID;
 }

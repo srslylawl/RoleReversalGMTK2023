@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameStateManager : MonoBehaviour {
-	[SerializeField] private CarController[] CarPrefabs;
-	[SerializeField] private FrogController FrogPrefab;
-
 	[SerializeField] private InputManager InputManager;
-
-
 	[SerializeField] private LevelData levelData;
 
 	private List<CarTimeData> carTimeData = new List<CarTimeData>();
@@ -22,6 +17,8 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private GameMode currentMode = GameMode.Car;
+
+	private GoalPoint activeGoalPoint;
 
 	private int CurrentTick;
 	private int HighestTick;
@@ -100,6 +97,30 @@ public class GameStateManager : MonoBehaviour {
 		CurrentTick = 0;
 	}
 
+	private void SetActiveGoalPoint(int id) {
+		if (activeGoalPoint != null) {
+			activeGoalPoint.OnGoalReached = null;
+		}
+
+		activeGoalPoint = GoalPoint.goalPoints[id];
+		activeGoalPoint.OnGoalReached = OnGoalReachedCallBack;
+	}
+
+	private void OnGoalReachedCallBack(GameObject go) {
+		if (currentMode == GameMode.Car) {
+			if (go.TryGetComponent(out CarController controller)) {
+				var same = controller == activeCarTimeData.Car;
+				if (same) {
+					//GOAL REACHED
+					//TODO: CHECK IF FROG WAS KILLED!
+					Debug.Log($"{go} reached the goal!");
+					EndRound();
+					Next();
+				}
+			}
+		}
+	}
+
 	private void Update() {
 		var pressed = Input.GetKeyDown(KeyCode.Space);
 		if (pressed) {
@@ -123,6 +144,7 @@ public class GameStateManager : MonoBehaviour {
 			activeCarTimeData = new CarTimeData(carObject.GetComponent<CarController>());
 			InputManager.SetCarController(activeCarTimeData.Car);
 			activeCarTimeData.Car.SetMode(false, activeCarTimeData);
+			SetActiveGoalPoint(currentData.GoalPointID);
 			//spawn new car
 		}
 

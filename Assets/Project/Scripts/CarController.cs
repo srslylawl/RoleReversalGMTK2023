@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class CarController : MonoBehaviour {
+public interface IController {
+	
+}
+
+public class CarController : MonoBehaviour, IController {
 
 
 	[FormerlySerializedAs("car")] [SerializeField] private CarData carData;
