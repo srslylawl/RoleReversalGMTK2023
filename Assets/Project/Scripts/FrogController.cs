@@ -18,6 +18,8 @@ public class FrogController : MonoBehaviour
     private Vector3 chargeStart;
     private Vector3 chargeEnd;
 
+    private bool rememberMe = false;
+
     private Rigidbody rb;
 
     public void Start()
@@ -53,6 +55,14 @@ public class FrogController : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetMouseButtonUp(0) && IsGrounded())
+        {
+            rememberMe = true;
+        }
+    }
+
+    private void FixedUpdate()
+    {
         if (jumpDirection != Vector3.zero)
         {
             var targetRotation = Quaternion.LookRotation(jumpDirection, Vector3.up);
@@ -60,7 +70,7 @@ public class FrogController : MonoBehaviour
             transform.rotation = targetRotation;
         }
 
-        if (Input.GetMouseButtonUp(0) && IsGrounded())
+        if (rememberMe)
         {
             rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
             
@@ -69,6 +79,8 @@ public class FrogController : MonoBehaviour
             chargeStart = Vector3.zero;
             chargeEnd = Vector3.zero;
             jumpDirection = Vector3.zero;
+
+            rememberMe = false;
         }
     }
 
@@ -84,7 +96,7 @@ public class FrogController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        if(Physics.CheckSphere(transform.position, 0.05f))
+        if(Physics.Raycast(transform.position, Vector3.down, out var hit, 0.2f))
             return true;
 
         return false;
