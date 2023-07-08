@@ -23,6 +23,8 @@ public class FrogTimeData {
 	
 	public TimeDataMode TimeDataMode;
 
+	public int DeathTick = 99999;
+
 	public Dictionary<int, ObjectTimeData> TimeData = new();
 	
 	public FrogTimeData(FrogController frog) {

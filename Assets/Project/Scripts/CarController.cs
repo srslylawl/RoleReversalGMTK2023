@@ -28,6 +28,8 @@ public class CarController : MonoBehaviour, IController {
 
 	private CarTimeData ownDataRef;
 
+	public Action<FrogController> OnFrogKilledCallBack;
+
 
 	private void Awake() {
 		rb = GetComponent<Rigidbody>();
@@ -101,11 +103,12 @@ public class CarController : MonoBehaviour, IController {
 					}
 				}
 
-				var otherFrog = cp.otherCollider.GetComponentInParent<FrogController>();
-                if (otherFrog != null)
+				var frog = cp.otherCollider.GetComponentInParent<FrogController>();
+                if (frog != null)
 				{
-                    Debug.Log($"CRASH WITH FROG: {otherFrog.gameObject}");
-                    otherFrog.Die();
+                    Debug.Log($"CRASH WITH FROG: {frog.gameObject}");
+					frog.Die();
+					OnFrogKilledCallBack?.Invoke(frog);
 				}
 			}
 		}
