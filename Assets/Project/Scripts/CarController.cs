@@ -88,6 +88,15 @@ public class CarController : MonoBehaviour, IController {
 						ownDataRef.TimeDataMode = TimeDataMode.Record;
 					}
 				}
+
+				if (cp.otherCollider.tag.Equals("Environment"))
+				{
+                    Debug.Log($"CRASH WITH Environment: {otherCar.gameObject}");
+                    if (ownDataRef != null)
+                    {
+                        ownDataRef.TimeDataMode = TimeDataMode.Record;
+                    }
+                }
 			}
 		}
 	}
