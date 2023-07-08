@@ -146,7 +146,6 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void ResetScene() {
-		GamePaused = true;
 		//Apply first tick data
 		foreach (var timeData in carTimeData) {
 			timeData.Car.ApplyTimeData(timeData.TimeData[0]);
@@ -159,9 +158,17 @@ public class GameStateManager : MonoBehaviour {
 				}
 			}
 			timeData.TimeDataMode = TimeDataMode.Replay;
+
+			if (!timeData.Car.gameObject.activeSelf) {
+				timeData.Car.gameObject.SetActive(true);
+			}
 		}
 		
 		foreach (var timeData in frogTimeData) {
+			if (!timeData.Frog.gameObject.activeSelf) {
+				timeData.Frog.gameObject.SetActive(true);
+			}
+			
 			timeData.Frog.ApplyTimeData(timeData.TimeData[0]);
 			if (timeData.TimeDataMode == TimeDataMode.Record) {
 				//make sure to set the rest of the times to the last tick
@@ -176,58 +183,103 @@ public class GameStateManager : MonoBehaviour {
 		CurrentTick = 0;
 	}
 
+	private void ResetOnFailure() {
+		StopRound();
+		
+		if (currentMode == GameMode.Car) {
+			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
+			var spTF = currentData.SpawnPoint.transform;
+			var car = activeCarTimeData.Car;
+			car.ApplyTimeData(activeCarTimeData.TimeData[0]);
+			InputManager.SetCarController(car);
+			activeCarTimeData.Car.SetMode(false, activeCarTimeData);
+			SetActiveCarGoalPoint(currentData.GoalPoint);
+			car.OnFrogKilledCallBack = OnRunOverFrogCallBack;
+
+			activeFrogHasBeenKilled = false;
+		}
+		
+		if (currentMode == GameMode.Frog) {
+			if (levelData.FrogLevelDatas.Length < CurrentLevelFrogIteration - 1) {
+				throw new Exception($"Frog Level Data too small! Current Iteration: {CurrentLevelCarIteration}, Cars: {levelData.CarLevelDatas.Length}");
+			}
+		
+			var cData = levelData.FrogLevelDatas[CurrentLevelFrogIteration];
+			var tf = cData.SpawnPoint.transform;
+			var frog = activeFrogTimeData.Frog;
+			frog.ApplyTimeData(activeFrogTimeData.TimeData[0]);
+			InputManager.SetFrogController(activeFrogTimeData.Frog);
+			activeFrogTimeData.TimeDataMode = TimeDataMode.Record;
+			SetActiveFrogGoalPoint(cData.GoalPoint);
+
+			activeFrogHasBeenKilled = false;
+		}
+		
+		ResetScene();
+		
+		UIManager.DisplayQuickText("Try again!", StartRound);
+	}
+
 	private void SetActiveCarGoalPoint(GoalPoint goalPoint) {
 		if (activeCarGoalPoint != null) {
 			activeCarGoalPoint.OnGoalReached = null;
+			activeCarGoalPoint.SetGoalActive(false);
 		}
 
 		activeCarGoalPoint = goalPoint;
 		
-		if(activeCarGoalPoint) activeCarGoalPoint.OnGoalReached = OnGoalReachedCallBack;
+		if(activeCarGoalPoint) {
+			activeCarGoalPoint.OnGoalReached = OnGoalReachedCallBack;
+			activeCarGoalPoint.SetGoalActive(true);
+		}
 	}
 
 	private void SetActiveFrogGoalPoint(GoalPoint goalPoint) {
 		if (activeFrogGoalPoint != null) {
 			activeFrogGoalPoint.OnGoalReached = null;
+			activeFrogGoalPoint.SetGoalActive(false);
 		}
 
 		activeFrogGoalPoint = goalPoint;
 		
-		if(activeFrogGoalPoint) activeFrogGoalPoint.OnGoalReached = OnGoalReachedCallBack;
+		if(activeFrogGoalPoint) {
+			activeFrogGoalPoint.OnGoalReached = OnGoalReachedCallBack;
+			activeFrogGoalPoint.SetGoalActive(true);
+		}
 	}
 
-	private void OnGoalReachedCallBack(GameObject go) {
-        if (currentMode == GameMode.Car) {
-			if (go.TryGetComponent(out CarController controller)) {
-				var same = controller == activeCarTimeData.Car;
+	private void OnGoalReachedCallBack(IController ctr) {
+		if (currentMode == GameMode.Car) {
+			if (ctr is CarController car) {
+				var same = car == activeCarTimeData.Car;
 				if (same) {
 					//GOAL REACHED
 					//TODO: CHECK IF FROG WAS KILLED! - frog needs to be killed to succeed!
 					if (activeFrogHasBeenKilled) {
-						Debug.Log($"{go} reached the goal and the frog is dead!");
+						Debug.Log($"{car} reached the goal and the frog is dead!");
 						EndRound();
 						Next();
-						return;
 					}
-					Debug.Log($"{go} reached the goal! BUT FROG IS STILL ALIVE!");
+					else {
+						
+						Debug.Log($"{car} reached the goal! BUT FROG IS STILL ALIVE!");
+					}
+
 				}
 			}
-			
-			
-			if (go.TryGetComponent(out FrogController frog)) {
+			if (ctr is FrogController frog) {
 				var same = frog == activeFrogTimeData.Frog;
 				if (same) {
 					//FROG REACHED GOAL WHILE IN CAR MODE - LOSE CONDITION!
-					//TODO: LOSE CONDITION
-					throw new NotImplementedException("LOSE CONDITION NOT IMPLEMENTED");
-					EndRound();
-					Next();
+					StopRound();
+					UIManager.DisplayQuickText("Frog escaped!", ResetOnFailure);
+
+					return;
 				}
 			}
 		}
-
 		if (currentMode == GameMode.Frog) {
-			if (go.TryGetComponent(out FrogController controller)) {
+			if (ctr is FrogController controller) {
 				var same = controller == activeFrogTimeData.Frog;
 				if (same) {
 					//GOAL REACHED
@@ -256,28 +308,13 @@ public class GameStateManager : MonoBehaviour {
         startOfRound = Time.time;
         UIManager.CountdowmTimeStart(maxTime);
     }
-
     private void EndTimer()
     {
         CurrentScore.SecondsRemaining += maxTime - Time.time - startOfRound;
         UIManager.CountdowmTimeStop();
     }
-
-    private void LoseLive(Action OnContinue) {
-		if (CurrentScore.RemainingLives == 0) {
-			//TODO: Game OVER!
-
-			return;
-		}
-		
-		
-		CurrentScore.RemainingLives--;
-		//TODO: UPDATE LIVES UI
-		
-		OnContinue?.Invoke();
-	}
 	
-	
+	//TODO: CALL THIS
 	private void OnCrashCallBack(CarController car) {
 		if (currentMode != GameMode.Car) {
 			throw new Exception("Car crash callback while in frog mode????");
@@ -287,15 +324,12 @@ public class GameStateManager : MonoBehaviour {
 			throw new Exception("Car crash called with inactive car");
 		
 		//RESTART ROUND
-		LoseLive(null);
-
-		EndRound();
+		ResetOnFailure();
 	}
 
 	private void OnRunOverFrogCallBack(FrogController frog) {
 		if (frog == activeFrogTimeData.Frog) {
 			//Frog killed! Success!
-			//TODO: set deathtime for frog
 			activeFrogTimeData.DeathTick = CurrentTick;
 			CurrentScore.CurrentFrogsKilled++;
 			activeFrogHasBeenKilled = true;
@@ -378,10 +412,14 @@ public class GameStateManager : MonoBehaviour {
         InputManager.UpdateControllers = true;
 	}
 
-	public void EndRound() {
-        EndTimer();
-        GamePaused = true;
+	public void StopRound() {
+		GamePaused = true;
 		InputManager.UpdateControllers = false;
+	}
+
+	public void EndRound() {
+		EndTimer();
+		StopRound();
 		if (currentMode == GameMode.Car) {
 			carTimeData.Add(activeCarTimeData);
 			activeCarTimeData.Car.SetMode(true, activeCarTimeData);

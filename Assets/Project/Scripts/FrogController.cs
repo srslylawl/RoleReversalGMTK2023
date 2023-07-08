@@ -2,7 +2,7 @@
 using UnityEngine;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-public class FrogController : MonoBehaviour
+public class FrogController : MonoBehaviour, IController
 {
     [SerializeField] private GameObject splatFrog;
     [SerializeField] private GameObject arrow;

@@ -2,23 +2,68 @@ using System;
 using UnityEngine;
 
 public class GoalPoint : MonoBehaviour {
-	[SerializeField] private float Radius = 2f;
-	
-	public Action<GameObject> OnGoalReached;
+	[SerializeField] private Mode mode;
+	[SerializeField] private GameObject Pond;
+	[SerializeField] private GameObject PondIndicator;
+	[SerializeField] private GameObject Car;
 
-	private SphereCollider coll;
-	private void Awake() {
-		coll = gameObject.AddComponent<SphereCollider>();
-		coll.isTrigger = true;
-		coll.radius = Radius;
+	private enum Mode {
+		Frog,
+		Car
+	}
+
+	public Action<IController> OnGoalReached;
+
+	public void SetGoalActive(bool active) {
+		if (mode == Mode.Frog) {
+			PondIndicator.SetActive(active);
+		}
+	}
+
+#if UNITY_EDITOR
+
+	private void OnValidate() {
+		if (mode == Mode.Car) {
+			SetModeToCar();
+		}
+		else {
+			SetModeToFrog();
+		}
+	}
+
+#endif
+
+	private void SetModeToFrog() {
+		Pond.SetActive(true);
+		Car.SetActive(false);
+	}
+
+	private void SetModeToCar() {
+		Pond.SetActive(false);
+		Car.SetActive(true);
 	}
 
 	private void OnTriggerEnter(Collider other) {
-		OnGoalReached?.Invoke(other.attachedRigidbody.gameObject);
-	}
+		var ctr = other.GetComponentInParent<IController>();
 
-	private void OnDrawGizmosSelected() {
-		Gizmos.color = Color.green;
-		Gizmos.DrawSphere(transform.position, Radius);
+		if (ctr == null) {
+			return;
+		}
+
+		if (mode == Mode.Frog) {
+			//Don't allow cars to use ponds as goals
+			if (ctr is CarController) {
+				//is car, don't call back!
+				return;
+			}
+		}
+
+		if (mode == Mode.Car) {
+			if (ctr is FrogController) {
+				return;
+			}
+		}
+
+		OnGoalReached?.Invoke(ctr);
 	}
 }
