@@ -7,6 +7,9 @@ using static UnityEngine.LightAnchor;
 
 public class FrogController : MonoBehaviour
 {
+
+    [SerializeField] private GameObject splatFrog;
+
     [SerializeField] private float chargeMultiplier;
     [SerializeField] private float maxJumpCharge;
     [SerializeField] private float jumpAngle;
@@ -15,36 +18,32 @@ public class FrogController : MonoBehaviour
 
     private Vector3 rotatedVector;
 
-    private Vector3 chargeStart;
     private Vector3 chargeEnd;
 
     private bool rememberMe = false;
 
     private Rigidbody rb;
+    private Animator fAnim;
 
     public void Start()
     {
         rb = GetComponent<Rigidbody>();
 
-        chargeStart = Vector3.zero;
-        chargeEnd = Vector3.zero + Vector3.back;
+        fAnim = GetComponentInChildren<Animator>();
+
+        chargeEnd = transform.position - transform.forward;
     }
 
     public void ReceiveTargetInput(Vector3 mouseWorldPosition)
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            chargeStart = mouseWorldPosition;
-        }
-
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && IsGrounded())
         {
             chargeEnd = mouseWorldPosition;
         }
 
-        if ((chargeStart - chargeEnd).magnitude > 0.1f)
+        if ((transform.position - chargeEnd).magnitude > 0.1f)
         {
-            jumpDirection = (chargeStart - chargeEnd) * chargeMultiplier;
+            jumpDirection = (transform.position - chargeEnd) * chargeMultiplier;
 
             if(jumpDirection.sqrMagnitude > maxJumpCharge * maxJumpCharge)
             {
@@ -63,21 +62,26 @@ public class FrogController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (jumpDirection != Vector3.zero)
+        if (Input.GetMouseButton(0))
         {
-            var targetRotation = Quaternion.LookRotation(jumpDirection, Vector3.up);
+            var targetRotation = new Vector3(0f, Quaternion.LookRotation(jumpDirection, Vector3.up).eulerAngles.y, 0f);
 
-            transform.rotation = targetRotation;
+            transform.eulerAngles = targetRotation;
         }
 
         if (rememberMe)
         {
             rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
-            
+
             rb.velocity = rotatedVector;
 
-            chargeStart = Vector3.zero;
-            chargeEnd = Vector3.zero;
+            if (rotatedVector != Vector3.zero)
+            {
+                //fAnim.speed = rotatedVector.magnitude;
+                fAnim.SetTrigger("Airborne");
+            }
+
+            chargeEnd = transform.position - transform.forward;
             jumpDirection = Vector3.zero;
 
             rememberMe = false;
@@ -96,9 +100,18 @@ public class FrogController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, out var hit, 0.2f))
+        if(Physics.Raycast(transform.position, Vector3.down, out var hit, 0.3f))
+        {
             return true;
+        }
 
         return false;
+    }
+
+    public void Die()
+    {
+        Instantiate(splatFrog, this.transform.position, splatFrog.transform.rotation);
+
+        Destroy(this.gameObject);
     }
 }

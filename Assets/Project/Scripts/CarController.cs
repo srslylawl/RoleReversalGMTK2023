@@ -78,25 +78,35 @@ public class CarController : MonoBehaviour, IController {
 	private void OnCollisionEnter(Collision other) {
 		var amount = other.GetContacts(contacts);
 		if (amount > 0) {
-			for (int i = 0; i < amount; i++) {
+			for (int i = 0; i < amount; i++)
+			{
 				var cp = contacts[i];
 				var otherCar = cp.otherCollider.GetComponentInParent<CarController>();
-				if (otherCar != null) {
+				if (otherCar != null)
+				{
 					//TURN OFF REPLAY
 					Debug.Log($"CRASH WITH CAR: {otherCar.gameObject}");
-					if (ownDataRef != null) {
+					if (ownDataRef != null)
+					{
 						ownDataRef.TimeDataMode = TimeDataMode.Record;
 					}
 				}
 
-				if (cp.otherCollider.tag.Equals("Environment"))
+				if (cp.otherCollider.CompareTag("Environment"))
 				{
-                    Debug.Log($"CRASH WITH Environment: {otherCar.gameObject}");
-                    if (ownDataRef != null)
-                    {
-                        ownDataRef.TimeDataMode = TimeDataMode.Record;
-                    }
-                }
+					Debug.Log($"CRASH WITH Environment: {otherCar.gameObject}");
+					if (ownDataRef != null)
+					{
+						ownDataRef.TimeDataMode = TimeDataMode.Record;
+					}
+				}
+
+				var otherFrog = cp.otherCollider.GetComponentInParent<FrogController>();
+                if (otherFrog != null)
+				{
+                    Debug.Log($"CRASH WITH FROG: {otherFrog.gameObject}");
+                    otherFrog.Die();
+				}
 			}
 		}
 	}
