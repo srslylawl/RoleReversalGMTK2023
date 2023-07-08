@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour {
     public static UIManager I;
-    
-    
+
     [SerializeField] private TextMeshProUGUI GetReadyText;
 
     private void Awake() {

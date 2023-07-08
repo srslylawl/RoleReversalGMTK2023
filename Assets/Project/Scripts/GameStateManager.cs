@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 
@@ -35,7 +36,10 @@ public class GameStateManager : MonoBehaviour {
 	private CarTimeData activeCarTimeData;
 	private FrogTimeData activeFrogTimeData;
 
-	[SerializeField] private Score CurrentScore = new Score();
+	[SerializeField] private float maxTime = 30;
+    private float remainingTime;
+	[SerializeField] private TextMeshProUGUI TimeRemaining;
+    [SerializeField] private Score CurrentScore = new Score();
 
 	enum GameMode {
 		Frog,
@@ -62,7 +66,7 @@ public class GameStateManager : MonoBehaviour {
 			return;
 		}
 
-		switch (currentMode) {
+        switch (currentMode) {
 			case GameMode.Frog:
 				foreach (var timeData in frogTimeData) {
 					if (timeData.TimeDataMode == TimeDataMode.Record) {
@@ -109,9 +113,11 @@ public class GameStateManager : MonoBehaviour {
 				break;
 		}
 
+		//Manage Time
+        ManageTime();
 
-		//Set all positions
-		foreach (var timeData in carTimeData) {
+        //Set all positions
+        foreach (var timeData in carTimeData) {
 			if (timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
 				if (!timeData.Car.gameObject.activeSelf) {
 					timeData.Car.gameObject.SetActive(true);
@@ -194,7 +200,7 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void OnGoalReachedCallBack(GameObject go) {
-		if (currentMode == GameMode.Car) {
+        if (currentMode == GameMode.Car) {
 			if (go.TryGetComponent(out CarController controller)) {
 				var same = controller == activeCarTimeData.Car;
 				if (same) {
@@ -233,7 +239,26 @@ public class GameStateManager : MonoBehaviour {
 				}
 			}
 		}
-	}
+
+		ResetTime();
+
+    }
+
+    private void ResetTime()
+    {
+        remainingTime = maxTime;
+        TimeRemaining.text = "Time Remaining: " + (int)remainingTime;
+    }
+
+    private void ManageTime()
+	{
+        remainingTime -= Time.fixedDeltaTime;
+        TimeRemaining.text = "Time Remaining: " + (int)remainingTime;
+        if (remainingTime == 0f)
+        {
+            //LoseLive();
+        }
+    }
 
 	private void LoseLive(Action OnContinue) {
 		if (CurrentScore.RemainingLives == 0) {
@@ -285,7 +310,9 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		StartFrogMode();
+		remainingTime = maxTime;
+
+        StartFrogMode();
 	}
 
 	private void StartFrogMode() {

@@ -150,7 +150,9 @@ MonoBehaviour:
   arrow: {fileID: 1819310559029432125}
   jumpStrength: 6
   jumpAngle: 30
-  maxChargeTime: 1.5
+  maxChargeTime: 0.666
+  charging: 0
+  rememberMe: 0
 --- !u!54 &6205974558321399442
 Rigidbody:
   m_ObjectHideFlags: 0

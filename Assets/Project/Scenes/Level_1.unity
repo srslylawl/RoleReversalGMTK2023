@@ -910,6 +910,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3500980617525781295, guid: b896014f8b4ecf646aadd57ae9d1a5c9, type: 3}
+      propertyPath: TimeRemaining
+      value: 
+      objectReference: {fileID: 1651706093}
+    - target: {fileID: 3500980617525781295, guid: b896014f8b4ecf646aadd57ae9d1a5c9, type: 3}
       propertyPath: levelData.CarLevelDatas.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -1257,7 +1261,7 @@ GameObject:
   - component: {fileID: 1651706094}
   - component: {fileID: 1651706093}
   m_Layer: 5
-  m_Name: timeRemaining
+  m_Name: TimeRemaining
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1303,7 +1307,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Time Remaining: 120'
+  m_text: 'Time Remaining: 30'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 71a89082ef79d594eb12d360ec0f61e0, type: 2}
   m_sharedMaterial: {fileID: -5319432424462088543, guid: 71a89082ef79d594eb12d360ec0f61e0, type: 2}
@@ -1707,7 +1711,7 @@ GameObject:
   - component: {fileID: 1845323259}
   - component: {fileID: 1845323258}
   m_Layer: 5
-  m_Name: livesRemaining
+  m_Name: LivesRemaining
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
