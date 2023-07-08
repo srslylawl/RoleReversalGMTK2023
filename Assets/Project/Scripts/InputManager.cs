@@ -50,6 +50,7 @@ public class InputManager : MonoBehaviour {
 
 		var inputHeld = Input.GetMouseButton(0);
 		var inputUp = Input.GetMouseButtonUp(0);
+		var inputDown = Input.GetMouseButtonDown(0);
 		
 		CarController?.ReceiveTargetInput(mouseWorldPos);
 		CarController?.ReceiveInputHeld(inputHeld);
@@ -57,6 +58,7 @@ public class InputManager : MonoBehaviour {
 		FrogController?.ReceiveInputHeld(inputHeld);
 		
 		if (inputUp) FrogController?.ReceiveInputUp(true);
+		if (inputDown) FrogController?.ReceiveInputDown(true);
     }
 
 	private void OnDrawGizmos() {

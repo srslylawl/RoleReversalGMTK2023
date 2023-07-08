@@ -24,6 +24,7 @@ public class FrogController : MonoBehaviour
 
     private bool inputHeld;
     private bool inputUp;
+    private bool inputDown;
 
     public void Start()
     {
@@ -52,6 +53,10 @@ public class FrogController : MonoBehaviour
 
     public void ReceiveInputHeld(bool held) {
         inputHeld = held;
+    }
+    
+    public void ReceiveInputDown(bool b) {
+        inputDown = b;
     }
 
     public void ReceiveInputUp(bool up) {
@@ -84,6 +89,7 @@ public class FrogController : MonoBehaviour
         }
 
         inputUp = false;
+        inputDown = false;
     }
 
     private void FixedUpdate()
@@ -144,4 +150,6 @@ public class FrogController : MonoBehaviour
         gameObject.SetActive(false);
         // Destroy(this.gameObject);
     }
+
+
 }
