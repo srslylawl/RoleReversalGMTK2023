@@ -415,6 +415,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce28e6bd4e0367c498ebdcd75539266c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RemainingTime: {fileID: 4663009379985368873}
   GetReadyText: {fileID: 4088984704098114145}
 --- !u!1 &3925481517760748963
 GameObject:
