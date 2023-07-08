@@ -1,23 +1,27 @@
 
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class FrogController : MonoBehaviour
 {
     [SerializeField] private GameObject splatFrog;
-
     [SerializeField] private GameObject arrow;
 
-    [SerializeField] private float chargeMultiplier;
-    [SerializeField] private float maxJumpCharge;
+    private GameObject corpseRev;
+
+    [SerializeField] private float jumpStrength;
     [SerializeField] private float jumpAngle;
+    [SerializeField] private float maxChargeTime;
 
     private Vector3 jumpDirection;
 
     private Vector3 rotatedVector;
 
     private Vector3 chargeEnd;
+    public bool charging;
+    private float chargeTime;
 
-    private bool rememberMe = false;
+    public bool rememberMe = false;
 
     private Rigidbody rb;
     private Animator fAnim;
@@ -25,6 +29,15 @@ public class FrogController : MonoBehaviour
     private bool inputHeld;
     private bool inputUp;
     private bool inputDown;
+
+    public void OnEnable()
+    {
+        if(corpseRev != null)
+        {
+            Destroy(corpseRev);
+            corpseRev = null;
+        }
+    }
 
     public void Start()
     {
@@ -72,18 +85,18 @@ public class FrogController : MonoBehaviour
 
         if ((transform.position - chargeEnd).magnitude > 0.1f)
         {
-            jumpDirection = (transform.position - chargeEnd) * chargeMultiplier;
-
-            if(jumpDirection.sqrMagnitude > maxJumpCharge * maxJumpCharge)
-            {
-                jumpDirection = jumpDirection.normalized * maxJumpCharge;
-            }
+            jumpDirection = (transform.position - chargeEnd);
         }
     }
 
     private void Update()
     {
-        if (inputUp && IsGrounded())
+        if(inputDown && IsGrounded())
+        {
+            charging = true;
+        }
+
+        if (inputUp && charging && IsGrounded())
         {
             rememberMe = true;
         }
@@ -94,31 +107,36 @@ public class FrogController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (inputHeld)
+
+        if (charging)
         {
             var targetRotation = new Vector3(0f, Quaternion.LookRotation(jumpDirection, Vector3.up).eulerAngles.y, 0f);
 
-            arrow.transform.localScale = new Vector3(1f, 1f, Mathf.Lerp(arrow.transform.localScale.z, jumpDirection.magnitude*2/maxJumpCharge, 0.25f));
+            chargeTime = Mathf.Clamp(chargeTime + Time.fixedDeltaTime, 0f, maxChargeTime);
+
+            arrow.transform.localScale = new Vector3(1f, 1f, Mathf.Lerp(arrow.transform.localScale.z, (chargeTime/maxChargeTime)*2f, 0.25f));
 
             transform.eulerAngles = targetRotation;
         }
 
-        if (rememberMe)
+        if (rememberMe && charging)
         {
             rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
 
-            rb.velocity = rotatedVector;
+            rb.velocity = rotatedVector.normalized * jumpStrength * (chargeTime / maxChargeTime);
 
             if (rotatedVector != Vector3.zero)
             {
-                fAnim.speed = (maxJumpCharge/4*3)/rotatedVector.magnitude;
+                fAnim.speed = ((maxChargeTime/chargeTime)*jumpStrength*3)/rotatedVector.magnitude;
                 fAnim.SetTrigger("Airborne");
             }
 
             chargeEnd = transform.position - transform.forward;
             arrow.transform.localScale = new Vector3(1f, 1f, 0f);
             jumpDirection = Vector3.zero;
+            chargeTime = 0f;
 
+            charging = false;
             rememberMe = false;
         }
     }
@@ -135,7 +153,7 @@ public class FrogController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        if(Physics.Raycast(transform.position, Vector3.down, out var hit, 0.3f))
+        if(Physics.Raycast(transform.position, Vector3.down, out var hit, 0.1f))
         {
             return true;
         }
@@ -145,11 +163,8 @@ public class FrogController : MonoBehaviour
 
     public void Die()
     {
-        Instantiate(splatFrog, this.transform.position, splatFrog.transform.rotation);
+        corpseRev = Instantiate(splatFrog, this.transform.position, splatFrog.transform.rotation);
 
         gameObject.SetActive(false);
-        // Destroy(this.gameObject);
     }
-
-
 }

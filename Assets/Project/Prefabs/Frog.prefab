@@ -148,9 +148,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   splatFrog: {fileID: 1083600859461223724, guid: 0f1fd590dc3082944b27dec720eabddb, type: 3}
   arrow: {fileID: 1819310559029432125}
-  chargeMultiplier: 1
-  maxJumpCharge: 3
+  jumpStrength: 6
   jumpAngle: 30
+  maxChargeTime: 1.5
 --- !u!54 &6205974558321399442
 Rigidbody:
   m_ObjectHideFlags: 0
