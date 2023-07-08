@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.LightAnchor;
 
 public class FrogController : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class FrogController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         chargeStart = Vector3.zero;
-        chargeEnd = Vector3.zero + Vector3.left;
+        chargeEnd = Vector3.zero + Vector3.back;
     }
 
     public void ReceiveTargetInput(Vector3 mouseWorldPosition)
@@ -39,7 +40,7 @@ public class FrogController : MonoBehaviour
             chargeEnd = mouseWorldPosition;
         }
 
-        if (chargeStart - chargeEnd != Vector3.zero)
+        if ((chargeStart - chargeEnd).magnitude > 0.1f)
         {
             jumpDirection = (chargeStart - chargeEnd) * chargeMultiplier;
 
@@ -47,21 +48,28 @@ public class FrogController : MonoBehaviour
             {
                 jumpDirection = jumpDirection.normalized * maxJumpCharge;
             }
-
-            rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
         }
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonUp(0) && IsGrounded())
+        if (jumpDirection != Vector3.zero)
         {
-            rb.velocity = rotatedVector;
+            var targetRotation = Quaternion.LookRotation(jumpDirection, Vector3.up);
+
+            transform.rotation = targetRotation;
         }
 
-        var targetRotation = Quaternion.LookRotation(jumpDirection, Vector3.up);
+        if (Input.GetMouseButtonUp(0) && IsGrounded())
+        {
+            rotatedVector = Vector3.RotateTowards(jumpDirection, Vector3.up, jumpAngle * Mathf.Deg2Rad, 0);
+            
+            rb.velocity = rotatedVector;
 
-        transform.rotation = targetRotation;
+            chargeStart = Vector3.zero;
+            chargeEnd = Vector3.zero;
+            jumpDirection = Vector3.zero;
+        }
     }
 
     private void OnDrawGizmos()
@@ -69,11 +77,14 @@ public class FrogController : MonoBehaviour
         var pos = transform.position;
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(pos, pos + rotatedVector.normalized);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(pos, 0.02f);
     }
 
     private bool IsGrounded()
     {
-        if(Physics.CheckSphere(transform.position, 0.01f))
+        if(Physics.CheckSphere(transform.position, 0.05f))
             return true;
 
         return false;
