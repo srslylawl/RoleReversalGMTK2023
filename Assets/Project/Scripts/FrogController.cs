@@ -10,6 +10,8 @@ public class FrogController : MonoBehaviour
 
     [SerializeField] private GameObject splatFrog;
 
+    [SerializeField] private GameObject arrow;
+
     [SerializeField] private float chargeMultiplier;
     [SerializeField] private float maxJumpCharge;
     [SerializeField] private float jumpAngle;
@@ -66,6 +68,8 @@ public class FrogController : MonoBehaviour
         {
             var targetRotation = new Vector3(0f, Quaternion.LookRotation(jumpDirection, Vector3.up).eulerAngles.y, 0f);
 
+            arrow.transform.localScale = new Vector3(1f, 1f, Mathf.Lerp(arrow.transform.localScale.z, jumpDirection.magnitude*2/maxJumpCharge, 0.25f));
+
             transform.eulerAngles = targetRotation;
         }
 
@@ -77,11 +81,12 @@ public class FrogController : MonoBehaviour
 
             if (rotatedVector != Vector3.zero)
             {
-                //fAnim.speed = rotatedVector.magnitude;
+                fAnim.speed = (maxJumpCharge/4*3)/rotatedVector.magnitude;
                 fAnim.SetTrigger("Airborne");
             }
 
             chargeEnd = transform.position - transform.forward;
+            arrow.transform.localScale = new Vector3(1f, 1f, 0f);
             jumpDirection = Vector3.zero;
 
             rememberMe = false;
