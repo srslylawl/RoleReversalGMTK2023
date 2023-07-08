@@ -7,11 +7,19 @@ public class InputManager : MonoBehaviour {
 	private Vector3 mouseWorldPos;
 
 
-	public CarController CarController;
+	private CarController CarController;
     public FrogController FrogController;
 
     private void Awake() {
 		cam = Camera.main;
+	}
+
+	public void SetCarController(CarController controller) {
+		if (CarController != null) {
+			CarController.ReceiveInputHeld(false);
+		}
+
+		CarController = controller;
 	}
 
 
@@ -27,8 +35,11 @@ public class InputManager : MonoBehaviour {
 		Vector3 intersectionPoint = ray.origin + t * ray.direction;
 
 		mouseWorldPos = intersectionPoint;
+
+		var inputHeld = Input.GetMouseButton(0);
 		
 		CarController?.ReceiveTargetInput(mouseWorldPos);
+		CarController?.ReceiveInputHeld(inputHeld);
         FrogController?.ReceiveTargetInput(mouseWorldPos);
     }
 
