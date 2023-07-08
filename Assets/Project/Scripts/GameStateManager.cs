@@ -137,10 +137,10 @@ public class GameStateManager : MonoBehaviour {
 				var same = controller == activeCarTimeData.Car;
 				if (same) {
 					//GOAL REACHED
-					//TODO: CHECK IF FROG WAS KILLED!
+					//TODO: CHECK IF FROG WAS KILLED! - frog needs to be killed to succeed!
 					Debug.Log($"{go} reached the goal!");
 					EndRound();
-					Next();
+					UIManager.StartReadyCountDown("Get to safety!", Next);
 				}
 			}
 		}
@@ -172,16 +172,8 @@ public class GameStateManager : MonoBehaviour {
 		//if all frogs have been killed, display score!
 	}
 
-	private void Update() {
-		var pressed = Input.GetKeyDown(KeyCode.Space);
-		if (pressed) {
-			if (GamePaused) {
-				Next();
-			}
-			else {
-				EndRound();
-			}
-		}
+	private void Start() {
+		UIManager.StartReadyCountDown("Ready?", Next);
 	}
 
 	public void Next() {
@@ -190,6 +182,8 @@ public class GameStateManager : MonoBehaviour {
 				throw new Exception($"Car Level Data too small! Current Iteration: {CurrentLevelCarIteration}, Cars: {levelData.CarLevelDatas.Length}");
 			}
 
+			
+			//START CAR MODE
 			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
 			var spTF = currentData.SpawnPoint.transform;
 			var carObject = Instantiate(currentData.CarPrefab, spTF.position, spTF.rotation);
