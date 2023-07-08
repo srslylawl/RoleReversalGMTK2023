@@ -906,6 +906,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3500980617525781295, guid: b896014f8b4ecf646aadd57ae9d1a5c9, type: 3}
+      propertyPath: maxTime
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500980617525781295, guid: b896014f8b4ecf646aadd57ae9d1a5c9, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
@@ -1307,7 +1311,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Time Remaining: 30'
+  m_text: 'Time Remaining: 45'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 71a89082ef79d594eb12d360ec0f61e0, type: 2}
   m_sharedMaterial: {fileID: -5319432424462088543, guid: 71a89082ef79d594eb12d360ec0f61e0, type: 2}
@@ -1698,6 +1702,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce28e6bd4e0367c498ebdcd75539266c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RemainingTime: {fileID: 1651706093}
   GetReadyText: {fileID: 969564088}
 --- !u!1 &1845323256
 GameObject:

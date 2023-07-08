@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -36,9 +37,8 @@ public class GameStateManager : MonoBehaviour {
 	private CarTimeData activeCarTimeData;
 	private FrogTimeData activeFrogTimeData;
 
-	[SerializeField] private float maxTime = 30;
-    private float remainingTime;
-	[SerializeField] private TextMeshProUGUI TimeRemaining;
+	[SerializeField] private float maxTime = 45;
+	private float startOfRound;
     [SerializeField] private Score CurrentScore = new Score();
 
 	enum GameMode {
@@ -112,9 +112,6 @@ public class GameStateManager : MonoBehaviour {
 				activeCarTimeData.TimeData[CurrentTick] = activeCarTimeData.Car.GetTimeData();
 				break;
 		}
-
-		//Manage Time
-        ManageTime();
 
         //Set all positions
         foreach (var timeData in carTimeData) {
@@ -239,28 +236,34 @@ public class GameStateManager : MonoBehaviour {
 				}
 			}
 		}
-
-		ResetTime();
-
     }
 
-    private void ResetTime()
+    private void GainScore(float remainingTime)
     {
-        remainingTime = maxTime;
-        TimeRemaining.text = "Time Remaining: " + (int)remainingTime;
+		switch (currentMode)
+		{
+			case GameMode.Frog:
+				CurrentScore.SecondsRemaining += remainingTime / 2;
+				break;
+			case GameMode.Car:
+                CurrentScore.SecondsRemaining += remainingTime;
+				break;
+		}
     }
 
-    private void ManageTime()
+	private void StartTimer()
 	{
-        remainingTime -= Time.fixedDeltaTime;
-        TimeRemaining.text = "Time Remaining: " + (int)remainingTime;
-        if (remainingTime == 0f)
-        {
-            //LoseLive();
-        }
+        startOfRound = Time.time;
+        UIManager.CountdowmTimeStart(maxTime);
     }
 
-	private void LoseLive(Action OnContinue) {
+    private void EndTimer()
+    {
+        CurrentScore.SecondsRemaining += maxTime - Time.time - startOfRound;
+        UIManager.CountdowmTimeStop();
+    }
+
+    private void LoseLive(Action OnContinue) {
 		if (CurrentScore.RemainingLives == 0) {
 			//TODO: Game OVER!
 
@@ -310,8 +313,6 @@ public class GameStateManager : MonoBehaviour {
 	}
 
 	private void Start() {
-		remainingTime = maxTime;
-
         StartFrogMode();
 	}
 
@@ -373,11 +374,13 @@ public class GameStateManager : MonoBehaviour {
 
 	public void StartRound() {
 		GamePaused = false;
-		InputManager.UpdateControllers = true;
+		StartTimer();
+        InputManager.UpdateControllers = true;
 	}
 
 	public void EndRound() {
-		GamePaused = true;
+        EndTimer();
+        GamePaused = true;
 		InputManager.UpdateControllers = false;
 		if (currentMode == GameMode.Car) {
 			carTimeData.Add(activeCarTimeData);

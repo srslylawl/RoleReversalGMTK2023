@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour {
     public static UIManager I;
+    public static Coroutine coroutine;
 
+    [SerializeField] private TextMeshProUGUI RemainingTime;
     [SerializeField] private TextMeshProUGUI GetReadyText;
 
     private void Awake() {
@@ -65,5 +67,30 @@ public class UIManager : MonoBehaviour {
         callBack?.Invoke();
         yield return null;
     }
-    
+
+
+
+    public static void CountdowmTimeStart(float maxTime)
+    {
+        coroutine = I.StartCoroutine(I.CountdowmTimeRountine(maxTime));
+    }
+
+    private IEnumerator CountdowmTimeRountine(float maxTime)
+    {
+        RemainingTime.gameObject.SetActive(true);
+        float timer = maxTime;
+        while(timer > 0) 
+        { 
+            timer -= Time.deltaTime;
+            RemainingTime.SetText("Time Remaining: " + (int)timer);
+            yield return null;
+        }
+
+        yield return null;
+    }
+
+    public static void CountdowmTimeStop()
+    {
+        I.StopCoroutine(coroutine);
+    }
 }
