@@ -7,17 +7,12 @@ using UnityEngine;
 public class Score {
 	public int TotalFrogAmount;
 	public int CurrentFrogsKilled;
-	public int TotalLives;
-	public int RemainingLives;
 
 	public float SecondsRemaining;
 
 	public int CalculateScore() {
 		//each frog killed adds 100 to score
 		int score = CurrentFrogsKilled * 100;
-		
-		//each remaining car live adds 200 to score;
-		score += RemainingLives * 200;
 		
 		//each second remaining adds 10 to score;
 		score += (int)(SecondsRemaining * 10);
@@ -59,7 +54,19 @@ public class GameStateManager : MonoBehaviour {
 
 	private bool GamePaused = true;
 
-	private void FixedUpdate() {
+    private void Update()
+    {
+		if (Input.GetKeyDown(KeyCode.S))
+		{
+			GameSuccess();
+		}
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            GameOver();
+        }
+    }
+
+    private void FixedUpdate() {
 		if (GamePaused) {
 			return;
 		}
@@ -444,4 +451,15 @@ public class GameStateManager : MonoBehaviour {
 
 		ResetScene();
 	}
+
+	public void GameOver()
+	{
+		UIManager.OpenGameOverUI();
+	}
+
+	public void GameSuccess()
+    {
+        UIManager.CloseGameUI();
+        UIManager.OpenScoreUI(CurrentScore.CalculateScore());
+    }
 }

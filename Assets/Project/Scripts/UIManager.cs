@@ -2,13 +2,21 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class UIManager : MonoBehaviour {
     public static UIManager I;
     public static Coroutine coroutine;
 
+    [SerializeField] private GameObject IngameUI;
+    [SerializeField] private GameObject ScoreUI;
+    [SerializeField] private GameObject GameOverUI;
+    [SerializeField] private GameObject NextBTN;
+    [SerializeField] private GameObject OutOfFrogUI;
     [SerializeField] private TextMeshProUGUI RemainingTime;
     [SerializeField] private TextMeshProUGUI GetReadyText;
+    [SerializeField] private TextMeshProUGUI Score;
 
     private void Awake() {
         if (I && I != this) {
@@ -86,9 +94,6 @@ public class UIManager : MonoBehaviour {
         GetReadyText.gameObject.SetActive(false);
         callBack?.Invoke();
     }
-    
-
-
 
     public static void CountdowmTimeStart(float maxTime)
     {
@@ -106,11 +111,51 @@ public class UIManager : MonoBehaviour {
             yield return null;
         }
 
+
         yield return null;
     }
 
     public static void CountdowmTimeStop()
     {
         I.StopCoroutine(coroutine);
+    }
+
+    public static void CloseGameUI()
+    {
+        I.IngameUI.SetActive(false);
+    }
+
+    public static void OpenGameOverUI()
+    {
+        I.GameOverUI.SetActive(true);
+    }
+
+    public static void OpenScoreUI(int score)
+    {
+        I.ScoreUI.SetActive(true);
+        I.Score.text = ""+score;
+
+        int nextScene = SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (SceneManager.sceneCount >= nextScene)
+        {
+            I.NextBTN.SetActive(true);
+            I.OutOfFrogUI.SetActive(false);
+        }
+        else
+        {
+            I.NextBTN.SetActive(false);
+            I.OutOfFrogUI.SetActive(true);
+        }
+    }
+
+    public static void Retry()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public static void NextLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
