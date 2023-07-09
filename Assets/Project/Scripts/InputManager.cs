@@ -7,11 +7,29 @@ public class InputManager : MonoBehaviour {
 
 
 	public CarController CarController;
-    public FrogController FrogController;
+	public FrogController FrogController;
+
+
+	public void SetUpdateControllers(bool update) {
+		UpdateControllers = update;
+
+		if (CarController != null) {
+			CarController.IsBeingControlled = update;
+		}
+		
+		if (FrogController != null) {
+			// FrogController.IsBeingControlled = update;
+		}
+
+		if (!update) {
+			CarController?.ReceiveInputHeld(false);
+			FrogController?.ReceiveInputHeld(false);
+		}
+	}
 
 	public bool UpdateControllers;
 
-    private void Awake() {
+	private void Awake() {
 		cam = Camera.main;
 	}
 
@@ -22,7 +40,7 @@ public class InputManager : MonoBehaviour {
 
 		CarController = controller;
 	}
-	
+
 	public void SetFrogController(FrogController controller) {
 		if (FrogController != null) {
 			FrogController.ReceiveInputHeld(false);
@@ -31,17 +49,17 @@ public class InputManager : MonoBehaviour {
 		FrogController = controller;
 	}
 
-
 	private void Update() {
 		if (!UpdateControllers) {
 			return;
 		}
+
 		var screenPos = Input.mousePosition;
 		var ray = cam.ScreenPointToRay(screenPos);
 		// Define the plane
 		Vector3 planeNormal = Vector3.up; // Plane normal pointing upwards
 		Vector3 planePoint = new Vector3(0f, 0f, 0f); // Point on the plane
-        
+
 		// Calculate the intersection
 		float t = Vector3.Dot(planePoint - ray.origin, planeNormal) / Vector3.Dot(ray.direction, planeNormal);
 		Vector3 intersectionPoint = ray.origin + t * ray.direction;
@@ -51,15 +69,15 @@ public class InputManager : MonoBehaviour {
 		var inputHeld = Input.GetMouseButton(0);
 		var inputUp = Input.GetMouseButtonUp(0);
 		var inputDown = Input.GetMouseButtonDown(0);
-		
+
 		CarController?.ReceiveTargetInput(mouseWorldPos);
 		CarController?.ReceiveInputHeld(inputHeld);
-        FrogController?.ReceiveTargetInput(mouseWorldPos);
+		FrogController?.ReceiveTargetInput(mouseWorldPos);
 		FrogController?.ReceiveInputHeld(inputHeld);
-		
+
 		if (inputUp) FrogController?.ReceiveInputUp(true);
 		if (inputDown) FrogController?.ReceiveInputDown(true);
-    }
+	}
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.green;

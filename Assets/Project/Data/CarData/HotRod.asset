@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f02b5aa78d82394e85b754437d36db6, type: 3}
   m_Name: HotRod
   m_EditorClassIdentifier: 
-  TurnSpeed: 125
+  TurnSpeed: 130
   TopSpeed: 50
-  Acceleration: 40
+  Acceleration: 25
   Grip: 7
   MaxTiltAngle: 35
   MaxTiltPerSecond: 20
@@ -30,6 +30,6 @@ MonoBehaviour:
     integralSaturation: 0.01
     derivativeMeasurement: 0
     valueLast: 0
-    errorLast: 0.000009205856
-    integrationStored: 0.009999365
+    errorLast: 33.747314
+    integrationStored: 0.01
     derivativeInitialized: 1

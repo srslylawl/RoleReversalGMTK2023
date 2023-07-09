@@ -57,8 +57,8 @@ MonoBehaviour:
     integralSaturation: 0.01
     derivativeMeasurement: 0
     valueLast: 0
-    errorLast: -0.0000097348175
-    integrationStored: -0.007773671
+    errorLast: 0
+    integrationStored: 0.009998978
     derivativeInitialized: 1
 --- !u!54 &6119005138094201261
 Rigidbody:

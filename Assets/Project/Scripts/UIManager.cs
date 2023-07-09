@@ -66,6 +66,7 @@ public class UIManager : MonoBehaviour {
         }
         timer = 1f;
         GetReadyText.SetText("3");
+        AudioManager.PlaySound("countDown");
         while (timer > 0f) {
             timer -= Time.deltaTime;
             var scale = timer*2 + 1;
@@ -73,6 +74,7 @@ public class UIManager : MonoBehaviour {
             yield return null;
         }
         GetReadyText.SetText("2");        
+        AudioManager.PlaySound("countDown");
         timer = 1f;
         while (timer > 0f) {
             timer -= Time.deltaTime;
@@ -81,6 +83,7 @@ public class UIManager : MonoBehaviour {
             yield return null;
         }
         GetReadyText.SetText("1");
+        AudioManager.PlaySound("countDown");
         timer = 1f;
         while (timer > 0f) {
             timer -= Time.deltaTime;
@@ -88,7 +91,6 @@ public class UIManager : MonoBehaviour {
             GetReadyText.rectTransform.localScale = baseScale * scale;
             yield return null;
         }
-
         GetReadyText.gameObject.SetActive(false);
         
         callBack?.Invoke();

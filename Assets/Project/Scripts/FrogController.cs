@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using Random = System.Random;
 
 public class FrogController : MonoBehaviour, IController
 {
@@ -31,6 +32,8 @@ public class FrogController : MonoBehaviour, IController
     private bool inputHeld;
     private bool inputUp;
     private bool inputDown;
+
+    private bool isHighPitched;
     
     private bool IsBeingReplayed;
     public FrogTimeData ownDataRef;
@@ -58,6 +61,10 @@ public class FrogController : MonoBehaviour, IController
         fAnim = GetComponentInChildren<Animator>();
 
         chargeEnd = transform.position - transform.forward;
+
+        if (UnityEngine.Random.Range(0, 2) == 0) {
+            isHighPitched = true;
+        }
     }
 
     public ObjectTimeData GetTimeData() {
@@ -65,7 +72,8 @@ public class FrogController : MonoBehaviour, IController
             AngularVelocity = rb.angularVelocity,
             Position = rb.position,
             Rotation = rb.rotation,
-            Velocity = rb.velocity
+            Velocity = rb.velocity,
+            HasInput = inputHeld
         };
     }
     
@@ -82,6 +90,7 @@ public class FrogController : MonoBehaviour, IController
         rb.position = timeData.Position;
         rb.rotation = timeData.Rotation;
         rb.velocity = timeData.Velocity;
+        inputHeld = timeData.HasInput;
     }
 
     public void ReceiveInputHeld(bool held) {
@@ -126,9 +135,19 @@ public class FrogController : MonoBehaviour, IController
         inputDown = false;
     }
 
+    private bool hadInputLastFrame;
+
     private void FixedUpdate() {
         if (IsBeingReplayed) {
             arrow.transform.localScale = new Vector3(1f, 1f, 0f);
+
+            if (!inputHeld && hadInputLastFrame) {
+                var sound = isHighPitched ? "frogHopHigh" : "frogHopLow";
+                AudioManager.PlaySoundAtPosition(transform.position, sound);
+            }
+            
+            
+            hadInputLastFrame = inputHeld;
             return;
         }
         
@@ -164,6 +183,12 @@ public class FrogController : MonoBehaviour, IController
             charging = false;
             rememberMe = false;
         }
+        
+        if (!inputHeld && hadInputLastFrame) {
+            var sound = isHighPitched ? "frogHopHigh" : "frogHopLow";
+            AudioManager.PlaySoundAtPosition(transform.position, sound);
+        }
+        hadInputLastFrame = inputHeld;
     }
 
     private void OnDrawGizmos()

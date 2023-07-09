@@ -39,20 +39,6 @@ public class AudioManager : MonoBehaviour {
 		AudioListener.volume = .2f;
 	}
 
-	// private void OnEnable() {
-	// 	DesynchedNetworkManager.OnBeforeClientChangeScene += SceneCleanup;
-	// 	DesynchedNetworkManager.OnBeforeServerChangeScene += SceneCleanup;
-	// }
-	//
-	// private void OnDisable() {
-	// 	DesynchedNetworkManager.OnBeforeClientChangeScene -= SceneCleanup;
-	// 	DesynchedNetworkManager.OnBeforeServerChangeScene -= SceneCleanup;
-	// }
-	//
-	// private void SceneCleanup() {
-	// 	_AudioSourcePool.Clear();
-	// }
-
 	private void LoadSoundClips() {
 		_soundsDictionary["wind"] = Resources.LoadAll<AudioClip>("Wind");
 		_soundsDictionary["frogHit"] = Resources.LoadAll<AudioClip>("FrogHit");
@@ -64,11 +50,17 @@ public class AudioManager : MonoBehaviour {
 		_soundsDictionary["successSmall"] = Resources.LoadAll<AudioClip>("SuccessSmall");
 		_soundsDictionary["drumFail"] = Resources.LoadAll<AudioClip>("DrumFail");
 		_soundsDictionary["drumGo"] = Resources.LoadAll<AudioClip>("DrumGo");
+		_soundsDictionary["carCrash"] = Resources.LoadAll<AudioClip>("CarCrash");
+		_soundsDictionary["frogHopHigh"] = Resources.LoadAll<AudioClip>("FrogHopHigh");
+		_soundsDictionary["frogHopLow"] = Resources.LoadAll<AudioClip>("FrogHopLow");
+		_soundsDictionary["countDown"] = Resources.LoadAll<AudioClip>("CountDown");
+		_soundsDictionary["countDownGo"] = Resources.LoadAll<AudioClip>("CountDownGo");
 
 
 		_volumeDictionary["tireScreech"] = .15f;
-		_volumeDictionary["carIdleSmall"] = .2f;
+		_volumeDictionary["carIdleSmall"] = .05f;
 		_volumeDictionary["carBig"] = .9f;
+		_volumeDictionary["carCrash"] = .85f;
 
 	}
 

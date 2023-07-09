@@ -26,6 +26,7 @@ public class CarController : MonoBehaviour, IController {
 	private float tiltAmount;
 
 	private bool IsBeingReplayed;
+	public bool IsBeingControlled;
 
 	private CarTimeData ownDataRef;
 
@@ -75,9 +76,10 @@ public class CarController : MonoBehaviour, IController {
 	private Action StopIdleSound;
 
 	private float lastScreechPlayTime;
-
+	
 	private void FixedUpdate() {
-		if (!IsBeingReplayed) {
+		var active = !IsBeingReplayed && IsBeingControlled;
+		if (active) {
 			DoAccelerate();
 			DoTurn();
 		}
@@ -121,6 +123,10 @@ public class CarController : MonoBehaviour, IController {
 	private void OnDisable() {
 		StopIdleSound?.Invoke();
 	}
+	
+	public void Reset() {
+		tiltAmount = 0;
+	}
 
 	private ContactPoint[] contacts = new ContactPoint[16];
 	private void OnCollisionEnter(Collision other) {
@@ -143,7 +149,7 @@ public class CarController : MonoBehaviour, IController {
 
 				if (cp.otherCollider.CompareTag("Environment"))
 				{
-					Debug.Log($"CRASH WITH Environment: {otherCar.gameObject}");
+					Debug.Log($"CRASH WITH Environment: {other.gameObject}");
 					// if (ownDataRef != null)
 					// {
 					// 	ownDataRef.TimeDataMode = TimeDataMode.Record;

@@ -64,14 +64,6 @@ public class GameStateManager : MonoBehaviour {
 
 	private bool GamePaused = true;
 
-    private void Update()
-    {
-		if (Input.GetKeyDown(KeyCode.F))
-        {
-            GameOver();
-        }
-    }
-
     private void FixedUpdate() {
 		if (GamePaused) {
 			return;
@@ -176,8 +168,9 @@ public class GameStateManager : MonoBehaviour {
 		
 		
 		if (currentMode == GameMode.Car) {
-			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
+			// var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
 			var car = activeCarTimeData.Car;
+			car.Reset();
 			car.ApplyTimeData(activeCarTimeData.TimeData[-1]);
 			// Debug.Log($"Set Origin Data: {activeCarTimeData.TimeData[-1].Position} |CurrentTick: {CurrentTick}");
 			
@@ -301,6 +294,10 @@ public class GameStateManager : MonoBehaviour {
 	}
 	
 	private void OnCrashCallBack([CanBeNull] CarController otherCar) {
+		if (GamePaused) {
+			return;
+		}
+		
 		if (currentMode != GameMode.Car) {
 			throw new Exception("Car crash callback while in frog mode????");
 		}
@@ -310,7 +307,8 @@ public class GameStateManager : MonoBehaviour {
 		
 		//quickly disable callbacks so we dont end up having to deal with resetting all accidentally killed frogs's death ticks
 		activeCarTimeData.Car.OnFrogKilledCallBack = null;
-		
+
+		AudioManager.PlaySound("carCrash");
 		StopRound();
 		if (otherCar != null) {
 			AudioManager.PlaySound("drumFail");
@@ -337,7 +335,7 @@ public class GameStateManager : MonoBehaviour {
 			//Activate goal
 			SetActiveCarGoalPoint(levelData.CarLevelDatas[CurrentLevelCarIteration].GoalPoint);
 
-			OnReset = () => {
+			OnReset += () => {
 				SetActiveCarGoalPoint(null);
 				activeFrogTimeData.DeathTick = oldDeathTick;
 				CurrentScore.CurrentFrogsKilled--;
@@ -350,8 +348,7 @@ public class GameStateManager : MonoBehaviour {
 			var oldDeathTick = frog.ownDataRef.DeathTick;
 			frog.ownDataRef.DeathTick = CurrentTick;
 			CurrentScore.BonusFrogsKilled++;
-			//TODO: SET SOME KIND OF CALLBACK TO RESET THIS TO HIS PREVIOUS TICK
-			OnReset = () => {
+			OnReset += () => {
 				frog.ownDataRef.DeathTick = oldDeathTick;
 				CurrentScore.BonusFrogsKilled--;
 			};
@@ -456,12 +453,13 @@ public class GameStateManager : MonoBehaviour {
 
 	public void StartRound() {
 		GamePaused = false;
-		InputManager.UpdateControllers = true;
+		InputManager.SetUpdateControllers(true);
+		AudioManager.PlaySound("countDownGo");
 	}
 
 	public void StopRound() {
 		GamePaused = true;
-		InputManager.UpdateControllers = false;
+		InputManager.SetUpdateControllers(false);
 	}
 
 	public void EndRound() {
