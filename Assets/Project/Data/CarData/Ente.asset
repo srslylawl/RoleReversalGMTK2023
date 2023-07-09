@@ -13,12 +13,14 @@ MonoBehaviour:
   m_Name: Ente
   m_EditorClassIdentifier: 
   TurnSpeed: 150
-  TopSpeed: 30
-  Acceleration: 20
-  Grip: 5
+  TopSpeed: 20
+  Acceleration: 15
+  Grip: 3
   MaxTiltAngle: 35
   MaxTiltPerSecond: 20
   VelocityTiltInfluence: 0.75
+  CarIdleSound: carIdleSmall
+  CarDriveSound: carSmall
   TurnPID:
     proportionalGain: 0.5
     integralGain: 0.1
@@ -28,6 +30,6 @@ MonoBehaviour:
     integralSaturation: 0.01
     derivativeMeasurement: 0
     valueLast: 0
-    errorLast: -7.1118195e-10
+    errorLast: 0
     integrationStored: 0.008931751
     derivativeInitialized: 1

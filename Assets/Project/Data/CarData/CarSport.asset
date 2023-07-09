@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f02b5aa78d82394e85b754437d36db6, type: 3}
+  m_Name: CarSport
+  m_EditorClassIdentifier: 
+  TurnSpeed: 180
+  TopSpeed: 40
+  Acceleration: 30
+  Grip: 15
+  MaxTiltAngle: 90
+  MaxTiltPerSecond: 50
+  VelocityTiltInfluence: 0.5
+  CarIdleSound: carIdleSmall
+  CarDriveSound: carSport
+  TurnPID:
+    proportionalGain: 0.5
+    integralGain: 0.1
+    derivativeGain: 0.35
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 0.01
+    derivativeMeasurement: 0
+    valueLast: 0
+    errorLast: -0.0000108062695
+    integrationStored: -0.009999746
+    derivativeInitialized: 1

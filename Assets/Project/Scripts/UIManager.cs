@@ -3,7 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
     public static UIManager I;
@@ -17,6 +17,9 @@ public class UIManager : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI RemainingTime;
     [SerializeField] private TextMeshProUGUI GetReadyText;
     [SerializeField] private TextMeshProUGUI Score;
+    [SerializeField] private TextMeshProUGUI FrogsKilledText;
+    [SerializeField] private TextMeshProUGUI ScoreText;
+    [SerializeField] private Slider AudioSlider;
 
     private void Awake() {
         if (I && I != this) {
@@ -27,7 +30,15 @@ public class UIManager : MonoBehaviour {
     }
 
     private void Start() {
-        // StartReadyCountDown("Get to safety!",null);
+        AudioSlider.SetValueWithoutNotify(AudioListener.volume);
+    }
+
+    public void SetAudioVolume(float vol) {
+        AudioListener.volume = vol;
+    }
+
+    public static void SetFrogsKilledText(string text) {
+        I.FrogsKilledText.SetText(text);
     }
 
     public static void StartReadyCountDown(string text, Action callBack) {
@@ -36,6 +47,10 @@ public class UIManager : MonoBehaviour {
 
     public static void DisplayQuickText(string text, float duration, Action callBack) {
         I.StartCoroutine(I.QuickTextRoutine(text, duration, callBack));
+    }
+
+    public static void SetScore(int amount) {
+        I.ScoreText.SetText($"Score: {amount}");
     }
 
     private IEnumerator ReadyCountDownRoutine(string firstText, Action callBack) {
@@ -94,30 +109,8 @@ public class UIManager : MonoBehaviour {
         GetReadyText.gameObject.SetActive(false);
         callBack?.Invoke();
     }
-
-    public static void CountdowmTimeStart(float maxTime)
-    {
-        coroutine = I.StartCoroutine(I.CountdowmTimeRountine(maxTime));
-    }
-
-    private IEnumerator CountdowmTimeRountine(float maxTime)
-    {
-        RemainingTime.gameObject.SetActive(true);
-        float timer = maxTime;
-        while(timer > 0) 
-        { 
-            timer -= Time.deltaTime;
-            RemainingTime.SetText("Time Remaining: " + (int)timer);
-            yield return null;
-        }
-
-
-        yield return null;
-    }
-
-    public static void CountdowmTimeStop()
-    {
-        I.StopCoroutine(coroutine);
+    public static void SetBonusTimerAmount(int amount) {
+        I.RemainingTime.SetText("Time Bonus: " + amount);
     }
 
     public static void CloseGameUI()

@@ -6,6 +6,7 @@ public class GoalPoint : MonoBehaviour {
 	[SerializeField] private GameObject Pond;
 	[SerializeField] private GameObject PondIndicator;
 	[SerializeField] private GameObject Car;
+	[SerializeField] private GameObject CarIndicator;
 
 	private enum Mode {
 		Frog,
@@ -17,6 +18,10 @@ public class GoalPoint : MonoBehaviour {
 	public void SetGoalActive(bool active) {
 		if (mode == Mode.Frog) {
 			PondIndicator.SetActive(active);
+		}
+
+		if (mode == Mode.Car) {
+			CarIndicator.SetActive(active);
 		}
 	}
 

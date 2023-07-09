@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f02b5aa78d82394e85b754437d36db6, type: 3}
+  m_Name: HotRod
+  m_EditorClassIdentifier: 
+  TurnSpeed: 125
+  TopSpeed: 50
+  Acceleration: 40
+  Grip: 7
+  MaxTiltAngle: 35
+  MaxTiltPerSecond: 20
+  VelocityTiltInfluence: 0.75
+  CarIdleSound: carIdleSmall
+  CarDriveSound: carBig
+  TurnPID:
+    proportionalGain: 0.5
+    integralGain: 0.1
+    derivativeGain: 0.35
+    outputMin: -1
+    outputMax: 1
+    integralSaturation: 0.01
+    derivativeMeasurement: 0
+    valueLast: 0
+    errorLast: 0.000009205856
+    integrationStored: 0.009999365
+    derivativeInitialized: 1

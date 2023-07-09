@@ -5,6 +5,8 @@ public struct ObjectTimeData {
 	public Vector3 Velocity;
 	public Quaternion Rotation;
 	public Vector3 AngularVelocity;
+	public bool HasInput;
+	
 
 	public static ObjectTimeData Empty() {
 		return new ObjectTimeData() {

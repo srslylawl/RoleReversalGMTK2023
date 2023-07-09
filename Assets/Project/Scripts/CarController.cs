@@ -19,6 +19,7 @@ public class CarController : MonoBehaviour, IController {
 	private Vector3 targetDestination;
 	private float distanceToDestination;
 	private bool inputHeld;
+	private bool inputHeldLastFrame;
 
 	private Vector3 targetUpDir;
 
@@ -70,11 +71,55 @@ public class CarController : MonoBehaviour, IController {
 		ownDataRef.TimeDataMode = beingReplayed ? TimeDataMode.Replay : TimeDataMode.Record;
 	}
 
+	private Action StopDrivingSound;
+	private Action StopIdleSound;
+
+	private float lastScreechPlayTime;
+
 	private void FixedUpdate() {
 		if (!IsBeingReplayed) {
 			DoAccelerate();
 			DoTurn();
 		}
+		
+		//Basically On release
+		if (!inputHeld && inputHeldLastFrame) {
+			StopDrivingSound?.Invoke();
+		}
+
+		//Basically On press
+		if (inputHeld && !inputHeldLastFrame) {
+			var src = AudioManager.PlaySoundUntilCancelled(carData.CarDriveSound, transform.position, true, out StopDrivingSound);
+			src.transform.parent = transform;
+		}
+
+		if (inputHeld) {
+			inputHeldLastFrame = true;
+		}
+		else {
+			inputHeldLastFrame = false;
+		}
+
+		var now = Time.time;
+		if (lastScreechPlayTime + .8f < now) {
+			if (rb.velocity.magnitude > 2f) {
+				var upDirDiff = Vector3.Dot(transform.up, Vector3.up);
+				if (1 - upDirDiff > .1f) {
+					AudioManager.PlaySoundAtPosition(transform.position, "tireScreech");
+					lastScreechPlayTime = now;
+				}
+			}
+
+		}
+	}
+
+	private void OnEnable() {
+		var src = AudioManager.PlaySoundUntilCancelled(carData.CarIdleSound, transform.position, true, out StopIdleSound);
+		src.transform.parent = transform;
+	}
+
+	private void OnDisable() {
+		StopIdleSound?.Invoke();
 	}
 
 	private ContactPoint[] contacts = new ContactPoint[16];
@@ -113,7 +158,7 @@ public class CarController : MonoBehaviour, IController {
 		var frog = other.GetComponentInParent<FrogController>();
 		if (frog != null)
 		{
-			Debug.Log($"CRASH WITH FROG: {frog.gameObject}");
+			// Debug.Log($"CRASH WITH FROG: {frog.gameObject}");
 			frog.Die();
 			OnFrogKilledCallBack?.Invoke(frog);
 		}
@@ -124,6 +169,7 @@ public class CarController : MonoBehaviour, IController {
 		rb.angularVelocity = data.AngularVelocity;
 		rb.position = data.Position;
 		rb.rotation = data.Rotation;
+		inputHeld = data.HasInput;
 	}
 	
 	
@@ -134,6 +180,7 @@ public class CarController : MonoBehaviour, IController {
 		timeData.Velocity = rb.velocity;
 		timeData.AngularVelocity = rb.angularVelocity;
 		timeData.Rotation = rb.rotation;
+		timeData.HasInput = inputHeld;
 		return timeData;
 	}
 

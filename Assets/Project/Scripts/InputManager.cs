@@ -6,7 +6,7 @@ public class InputManager : MonoBehaviour {
 	private Vector3 mouseWorldPos;
 
 
-	private CarController CarController;
+	public CarController CarController;
     public FrogController FrogController;
 
 	public bool UpdateControllers;

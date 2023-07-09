@@ -190,6 +190,7 @@ public class FrogController : MonoBehaviour, IController
         var pos = transform.position;
         pos.y = 0.05f;
         corpseRev = Instantiate(splatFrog, pos, splatFrog.transform.rotation);
+        AudioManager.PlaySoundAtPosition(pos, "frogHit");
         gameObject.SetActive(false);
         
         OnGettingRoadKilledCallBack?.Invoke();
