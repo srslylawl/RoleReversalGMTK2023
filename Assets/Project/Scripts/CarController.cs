@@ -29,6 +29,7 @@ public class CarController : MonoBehaviour, IController {
 	private CarTimeData ownDataRef;
 
 	public Action<FrogController> OnFrogKilledCallBack;
+	public Action<CarController> OnCrashCallBack;
 
 
 	private void Awake() {
@@ -88,29 +89,33 @@ public class CarController : MonoBehaviour, IController {
 				{
 					//TURN OFF REPLAY
 					Debug.Log($"CRASH WITH CAR: {otherCar.gameObject}");
-					if (ownDataRef != null)
-					{
-						ownDataRef.TimeDataMode = TimeDataMode.Record;
-					}
+					// if (ownDataRef != null)
+					// {
+					// 	ownDataRef.TimeDataMode = TimeDataMode.Record;
+					// }
+					OnCrashCallBack?.Invoke(otherCar);
 				}
 
 				if (cp.otherCollider.CompareTag("Environment"))
 				{
 					Debug.Log($"CRASH WITH Environment: {otherCar.gameObject}");
-					if (ownDataRef != null)
-					{
-						ownDataRef.TimeDataMode = TimeDataMode.Record;
-					}
-				}
-
-				var frog = cp.otherCollider.GetComponentInParent<FrogController>();
-                if (frog != null)
-				{
-                    Debug.Log($"CRASH WITH FROG: {frog.gameObject}");
-					frog.Die();
-					OnFrogKilledCallBack?.Invoke(frog);
+					// if (ownDataRef != null)
+					// {
+					// 	ownDataRef.TimeDataMode = TimeDataMode.Record;
+					// }
+					OnCrashCallBack?.Invoke(null);
 				}
 			}
+		}
+	}
+	
+	private void OnTriggerEnter(Collider other) {
+		var frog = other.GetComponentInParent<FrogController>();
+		if (frog != null)
+		{
+			Debug.Log($"CRASH WITH FROG: {frog.gameObject}");
+			frog.Die();
+			OnFrogKilledCallBack?.Invoke(frog);
 		}
 	}
 

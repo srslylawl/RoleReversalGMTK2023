@@ -26,8 +26,8 @@ public class UIManager : MonoBehaviour {
         I.StartCoroutine(I.ReadyCountDownRoutine(text, callBack));
     }
 
-    public static void DisplayQuickText(string text, Action callBack) {
-        I.StartCoroutine(I.QuickTextRoutine(text, callBack));
+    public static void DisplayQuickText(string text, float duration, Action callBack) {
+        I.StartCoroutine(I.QuickTextRoutine(text, duration, callBack));
     }
 
     private IEnumerator ReadyCountDownRoutine(string firstText, Action callBack) {
@@ -72,10 +72,10 @@ public class UIManager : MonoBehaviour {
         yield return null;
     }
     
-    private IEnumerator QuickTextRoutine(string firstText, Action callBack) {
+    private IEnumerator QuickTextRoutine(string firstText, float duration, Action callBack) {
         GetReadyText.gameObject.SetActive(true);
         GetReadyText.SetText(firstText);
-        float timer = 1f;
+        float timer = duration;
         var baseScale = new Vector3(1, 1, 1);
         GetReadyText.rectTransform.localScale = baseScale * 1.5f;
 

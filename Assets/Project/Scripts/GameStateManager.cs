@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using TMPro;
+using JetBrains.Annotations;
 using UnityEngine;
 
 
@@ -54,7 +53,6 @@ public class GameStateManager : MonoBehaviour {
 	private bool activeFrogHasBeenKilled;
 
 	private int CurrentTick;
-	private int HighestTick;
 
 	private int CurrentLevelCarIteration;
 	private int CurrentLevelFrogIteration;
@@ -72,50 +70,31 @@ public class GameStateManager : MonoBehaviour {
 					if (timeData.TimeDataMode == TimeDataMode.Record) {
 						timeData.TimeData[CurrentTick] = timeData.Frog.GetTimeData();
 					}
-
-					if (timeData.TimeDataMode == TimeDataMode.Replay) {
-						var alreadyDead = timeData.DeathTick <= CurrentTick;
-						if (!alreadyDead && timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
-							if (!timeData.Frog.gameObject.activeSelf) {
-								timeData.Frog.gameObject.SetActive(true);
-							}
-
-							timeData.Frog.ApplyTimeData(data);
-						}
-						else {
-							timeData.Frog.gameObject.SetActive(false);
-						}
-					}
 				}
-				activeFrogTimeData.TimeData[CurrentTick] = activeFrogTimeData.Frog.GetTimeData();
+				if (activeFrogTimeData.TimeDataMode == TimeDataMode.Record) {
+					activeFrogTimeData.TimeData[CurrentTick] = activeFrogTimeData.Frog.GetTimeData();
+				}
 				break;
 			case GameMode.Car:
 				foreach (var timeData in carTimeData) {
+					//RECORD
 					if (timeData.TimeDataMode == TimeDataMode.Record) {
 						timeData.TimeData[CurrentTick] = timeData.Car.GetTimeData();
 					}
-
-					if (timeData.TimeDataMode == TimeDataMode.Replay) {
-						if (timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
-							if (!timeData.Car.gameObject.activeSelf) {
-								timeData.Car.gameObject.SetActive(true);
-							}
-
-							timeData.Car.ApplyTimeData(data);
-						}
-						else {
-							timeData.Car.gameObject.SetActive(false);
-						}
-					}
 				}
-				
-				activeCarTimeData.TimeData[CurrentTick] = activeCarTimeData.Car.GetTimeData();
+
+				if (activeCarTimeData.TimeDataMode == TimeDataMode.Record) {
+					activeCarTimeData.TimeData[CurrentTick] = activeCarTimeData.Car.GetTimeData();
+				}
 				break;
 		}
 
         //Set all positions
         foreach (var timeData in carTimeData) {
-			if (timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
+			if (timeData.TimeDataMode == TimeDataMode.Record) continue;
+			
+			var alreadyDead = timeData.DeathTick <= CurrentTick;
+			if (!alreadyDead && timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
 				if (!timeData.Car.gameObject.activeSelf) {
 					timeData.Car.gameObject.SetActive(true);
 				}
@@ -128,6 +107,7 @@ public class GameStateManager : MonoBehaviour {
 		}
 		
 		foreach (var timeData in frogTimeData) {
+			if (timeData.TimeDataMode == TimeDataMode.Record) continue;
 			var alreadyDead = timeData.DeathTick <= CurrentTick;
 			if (!alreadyDead && timeData.TimeData.TryGetValue(CurrentTick, out var data)) {
 				if (!timeData.Frog.gameObject.activeSelf) {
@@ -142,26 +122,17 @@ public class GameStateManager : MonoBehaviour {
 		}
 
 		CurrentTick++;
-		HighestTick = Math.Max(CurrentTick, HighestTick);
 	}
 
 	private void ResetScene() {
 		//Apply first tick data
 		foreach (var timeData in carTimeData) {
-			timeData.Car.ApplyTimeData(timeData.TimeData[0]);
-
-			if (timeData.TimeDataMode == TimeDataMode.Record) {
-				//make sure to set the rest of the times to the last tick
-				var last = timeData.TimeData[CurrentTick-1];
-				for (int i = CurrentTick; i <= HighestTick; i++) {
-					timeData.TimeData[i] = last;
-				}
-			}
-			timeData.TimeDataMode = TimeDataMode.Replay;
-
 			if (!timeData.Car.gameObject.activeSelf) {
 				timeData.Car.gameObject.SetActive(true);
 			}
+			
+			timeData.Car.ApplyTimeData(timeData.TimeData[-1]);
+			timeData.TimeDataMode = TimeDataMode.Replay;
 		}
 		
 		foreach (var timeData in frogTimeData) {
@@ -169,16 +140,11 @@ public class GameStateManager : MonoBehaviour {
 				timeData.Frog.gameObject.SetActive(true);
 			}
 			
-			timeData.Frog.ApplyTimeData(timeData.TimeData[0]);
-			if (timeData.TimeDataMode == TimeDataMode.Record) {
-				//make sure to set the rest of the times to the last tick
-				var last = timeData.TimeData[CurrentTick-1];
-				for (int i = CurrentTick; i <= HighestTick; i++) {
-					timeData.TimeData[i] = last;
-				}
-			}
+			timeData.Frog.ApplyTimeData(timeData.TimeData[-1]);
 			timeData.TimeDataMode = TimeDataMode.Replay;
 		}
+		
+		Debug.Log($"Set Origin Data for past objects: CurrentTick: {CurrentTick}");
 		
 		CurrentTick = 0;
 	}
@@ -188,13 +154,16 @@ public class GameStateManager : MonoBehaviour {
 		
 		if (currentMode == GameMode.Car) {
 			var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
-			var spTF = currentData.SpawnPoint.transform;
 			var car = activeCarTimeData.Car;
-			car.ApplyTimeData(activeCarTimeData.TimeData[0]);
+			car.ApplyTimeData(activeCarTimeData.TimeData[-1]);
+			Debug.Log($"Set Origin Data: {activeCarTimeData.TimeData[-1].Position} |CurrentTick: {CurrentTick}");
+			
 			InputManager.SetCarController(car);
 			activeCarTimeData.Car.SetMode(false, activeCarTimeData);
 			SetActiveCarGoalPoint(currentData.GoalPoint);
 			car.OnFrogKilledCallBack = OnRunOverFrogCallBack;
+			car.OnCrashCallBack = OnCrashCallBack;
+			activeFrogTimeData.Frog.SetKillArrowActive(true);
 
 			activeFrogHasBeenKilled = false;
 		}
@@ -205,9 +174,9 @@ public class GameStateManager : MonoBehaviour {
 			}
 		
 			var cData = levelData.FrogLevelDatas[CurrentLevelFrogIteration];
-			var tf = cData.SpawnPoint.transform;
 			var frog = activeFrogTimeData.Frog;
-			frog.ApplyTimeData(activeFrogTimeData.TimeData[0]);
+			frog.gameObject.SetActive(true);
+			frog.ApplyTimeData(activeFrogTimeData.TimeData[-1]);
 			InputManager.SetFrogController(activeFrogTimeData.Frog);
 			activeFrogTimeData.TimeDataMode = TimeDataMode.Record;
 			SetActiveFrogGoalPoint(cData.GoalPoint);
@@ -217,7 +186,7 @@ public class GameStateManager : MonoBehaviour {
 		
 		ResetScene();
 		
-		UIManager.DisplayQuickText("Try again!", StartRound);
+		UIManager.DisplayQuickText("Try again!", 2f, StartRound);
 	}
 
 	private void SetActiveCarGoalPoint(GoalPoint goalPoint) {
@@ -248,6 +217,11 @@ public class GameStateManager : MonoBehaviour {
 		}
 	}
 
+	private void OnGettingRoadKilledCallBack() {
+		StopRound();
+		UIManager.DisplayQuickText("oof heavy traffic today!", 2f, ResetOnFailure);
+	}
+
 	private void OnGoalReachedCallBack(IController ctr) {
 		if (currentMode == GameMode.Car) {
 			if (ctr is CarController car) {
@@ -272,7 +246,7 @@ public class GameStateManager : MonoBehaviour {
 				if (same) {
 					//FROG REACHED GOAL WHILE IN CAR MODE - LOSE CONDITION!
 					StopRound();
-					UIManager.DisplayQuickText("Frog escaped!", ResetOnFailure);
+					UIManager.DisplayQuickText("Frog escaped!", 2f, ResetOnFailure);
 
 					return;
 				}
@@ -290,19 +264,6 @@ public class GameStateManager : MonoBehaviour {
 		}
     }
 
-    private void GainScore(float remainingTime)
-    {
-		switch (currentMode)
-		{
-			case GameMode.Frog:
-				CurrentScore.SecondsRemaining += remainingTime / 2;
-				break;
-			case GameMode.Car:
-                CurrentScore.SecondsRemaining += remainingTime;
-				break;
-		}
-    }
-
 	private void StartTimer()
 	{
         startOfRound = Time.time;
@@ -314,17 +275,20 @@ public class GameStateManager : MonoBehaviour {
         UIManager.CountdowmTimeStop();
     }
 	
-	//TODO: CALL THIS
-	private void OnCrashCallBack(CarController car) {
+	private void OnCrashCallBack([CanBeNull] CarController otherCar) {
 		if (currentMode != GameMode.Car) {
 			throw new Exception("Car crash callback while in frog mode????");
 		}
 
-		if (car != activeCarTimeData.Car)
-			throw new Exception("Car crash called with inactive car");
+		if (otherCar == activeCarTimeData.Car)
+			throw new Exception("Car crash with itself????");
+		
+		//quickly disable callbacks so we dont end up having to deal with resetting all accidentally killed frogs's death ticks
+		activeCarTimeData.Car.OnFrogKilledCallBack = null;
 		
 		//RESTART ROUND
-		ResetOnFailure();
+		StopRound();
+		UIManager.DisplayQuickText("Traffic violation!", 2f, ResetOnFailure);
 	}
 
 	private void OnRunOverFrogCallBack(FrogController frog) {
@@ -339,6 +303,10 @@ public class GameStateManager : MonoBehaviour {
 			// Next();
 
 			return;
+		}
+		else {
+			//update frog kill time
+			frog.ownDataRef.DeathTick = CurrentTick;
 		}
 		//Make sure frog has not been killed already
 		// CurrentScore.CurrentFrogsKilled++;
@@ -359,15 +327,26 @@ public class GameStateManager : MonoBehaviour {
 		var currentData = levelData.FrogLevelDatas[CurrentLevelFrogIteration];
 		var spTF = currentData.SpawnPoint.transform;
 		var frogObject = Instantiate(currentData.FrogPrefab, spTF.position, spTF.rotation);
+		frogObject.name = "FROG_" + CurrentLevelFrogIteration + 1;
 		activeFrogTimeData = new FrogTimeData(frogObject.GetComponent<FrogController>());
 		InputManager.SetFrogController(activeFrogTimeData.Frog);
 		activeFrogTimeData.TimeDataMode = TimeDataMode.Record;
-		SetActiveFrogGoalPoint(currentData.GoalPoint);
 		
-		UIManager.StartReadyCountDown("Get to safety!", StartRound);
+		var goal = currentData.GoalPoint;
+		SetActiveFrogGoalPoint(goal);
+		
+		//Set camera to goal
+		CameraScript.AssignGoalTarget(goal.transform);
 		CameraScript.AssignFrogTarget(frogObject.transform);
-		CameraScript.SwitchCameras(false);
 
+		activeFrogTimeData.Frog.OnGettingRoadKilledCallBack = OnGettingRoadKilledCallBack;
+
+		CameraScript.SwitchCameras(CameraScript.TargetCam.Goal);
+		UIManager.DisplayQuickText("Get to safety!", 2f, () => {
+			//Set camera to frog
+			CameraScript.SwitchCameras(CameraScript.TargetCam.Frog);
+			UIManager.StartReadyCountDown("Ready?", StartRound);
+		});
 	}
 
 	private void StartCarMode() {
@@ -382,15 +361,26 @@ public class GameStateManager : MonoBehaviour {
 		var currentData = levelData.CarLevelDatas[CurrentLevelCarIteration];
 		var spTF = currentData.SpawnPoint.transform;
 		var carObject = Instantiate(currentData.CarPrefab, spTF.position, spTF.rotation);
+		carObject.name = "CAR_" + CurrentLevelCarIteration + 1;
 		var car = carObject.GetComponent<CarController>();
 		activeCarTimeData = new CarTimeData(car);
 		InputManager.SetCarController(car);
 		activeCarTimeData.Car.SetMode(false, activeCarTimeData);
 		SetActiveCarGoalPoint(currentData.GoalPoint);
 		car.OnFrogKilledCallBack = OnRunOverFrogCallBack;
+		car.OnCrashCallBack = OnCrashCallBack;
 		
-		UIManager.StartReadyCountDown("Don't let him escape!", StartRound);
-		CameraScript.SwitchCameras(true);
+		//Set frog kill target
+		activeFrogTimeData.Frog.SetKillArrowActive(true);
+		activeFrogTimeData.Frog.SetMode(true, activeFrogTimeData);
+		
+		CameraScript.AssignCarZoomTarget(carObject.transform);
+		CameraScript.SwitchCameras(CameraScript.TargetCam.CarZoom);
+		UIManager.DisplayQuickText("Drive safely!", 2f, () => {
+			CameraScript.SwitchCameras(CameraScript.TargetCam.Car);
+			UIManager.StartReadyCountDown("Don't let him escape!", StartRound);
+		});
+		
 	}
 
 	public void Next() {
@@ -399,6 +389,7 @@ public class GameStateManager : MonoBehaviour {
 			StartFrogMode();
 			return;
 		}
+		
 
 		if (currentMode == GameMode.Frog) {
 			StartCarMode();
@@ -422,21 +413,28 @@ public class GameStateManager : MonoBehaviour {
 		StopRound();
 		if (currentMode == GameMode.Car) {
 			carTimeData.Add(activeCarTimeData);
-			activeCarTimeData.Car.SetMode(true, activeCarTimeData);
-			activeCarTimeData.Car.OnFrogKilledCallBack = null;
+			var car = activeCarTimeData.Car;
+			car.SetMode(true, activeCarTimeData);
+			car.OnFrogKilledCallBack = null;
+			car.OnCrashCallBack = null;
+			activeCarTimeData.DeathTick = CurrentTick;
+			
+			
 			activeCarTimeData = null;
 			InputManager.SetCarController(null);
 			SetActiveCarGoalPoint(null);
 			activeFrogHasBeenKilled = false;
+			activeFrogTimeData.Frog.SetKillArrowActive(false);
 
 			CurrentLevelCarIteration++;
 		}
 
 		if (currentMode == GameMode.Frog) {
 			frogTimeData.Add(activeFrogTimeData);
-			activeFrogTimeData.TimeDataMode = TimeDataMode.Replay;
-			// activeFrogTimeData = null;
+			activeFrogTimeData.Frog.SetMode(true, activeFrogTimeData);
+			activeFrogTimeData.Frog.OnGettingRoadKilledCallBack = null;
 			InputManager.SetFrogController(null);
+			activeFrogTimeData.DeathTick = CurrentTick;
 
 			CameraScript.AssignFrogTarget(null);
 			CurrentLevelFrogIteration++;

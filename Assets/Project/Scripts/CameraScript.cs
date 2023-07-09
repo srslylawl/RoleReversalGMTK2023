@@ -1,3 +1,4 @@
+using System;
 using Cinemachine;
 using UnityEngine;
 
@@ -5,9 +6,8 @@ public class CameraScript : MonoBehaviour {
     public static CameraScript I;
     [SerializeField] private CinemachineVirtualCamera carCamera;
     [SerializeField] private CinemachineVirtualCamera frogCamera;
-
-    private bool carCamActive = true;
-
+    [SerializeField] private CinemachineVirtualCamera goalCamera;
+    [SerializeField] private CinemachineVirtualCamera carZoomCamera;
 
     private void Awake() {
         if (I && I != this) {
@@ -17,13 +17,27 @@ public class CameraScript : MonoBehaviour {
         I = this;
     }
 
-    public static void SwitchCameras(bool toCar) {
-        var newActiveCam = toCar ? I.carCamera : I.frogCamera;
-        var otherCam = toCar ? I.frogCamera : I.carCamera;
+    public enum TargetCam {
+        Car,
+        Frog,
+        Goal,
+        CarZoom
+    }
 
+    public static void SwitchCameras(TargetCam cam) {
+        I.carCamera.Priority = 1;
+        I.frogCamera.Priority = 1;
+        I.goalCamera.Priority = 1;
+        I.carZoomCamera.Priority = 1;
+
+        CinemachineVirtualCamera newActiveCam = cam switch {
+            TargetCam.Car => I.carCamera,
+            TargetCam.Frog => I.frogCamera,
+            TargetCam.Goal => I.goalCamera,
+            TargetCam.CarZoom => I.carZoomCamera,
+            _ => throw new ArgumentOutOfRangeException($"no case for {cam}")
+        };
         newActiveCam.Priority = 2;
-        otherCam.Priority = 1;
-        I.carCamActive = toCar;
     }
 
     public static void AssignFrogTarget(Transform frog) {
@@ -31,9 +45,13 @@ public class CameraScript : MonoBehaviour {
         I.frogCamera.LookAt = frog;
     }
 
-    private void Update() {
-        if (Input.GetKeyDown(KeyCode.LeftAlt)) {
-            SwitchCameras(!carCamActive);
-        }
+    public static void AssignGoalTarget(Transform goal) {
+        I.goalCamera.Follow = goal;
+        I.goalCamera.LookAt = goal;
+    }
+    
+    public static void AssignCarZoomTarget(Transform car) {
+        I.carZoomCamera.Follow = car;
+        I.carZoomCamera.LookAt = car;
     }
 }

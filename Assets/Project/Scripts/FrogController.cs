@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
@@ -6,6 +7,7 @@ public class FrogController : MonoBehaviour, IController
 {
     [SerializeField] private GameObject splatFrog;
     [SerializeField] private GameObject arrow;
+    [SerializeField] private GameObject killArrow;
 
     private GameObject corpseRev;
 
@@ -29,6 +31,16 @@ public class FrogController : MonoBehaviour, IController
     private bool inputHeld;
     private bool inputUp;
     private bool inputDown;
+    
+    private bool IsBeingReplayed;
+    public FrogTimeData ownDataRef;
+
+    public Action OnGettingRoadKilledCallBack;
+
+
+    public void SetKillArrowActive(bool active) {
+        killArrow.SetActive(active);
+    }
 
     public void OnEnable()
     {
@@ -56,6 +68,14 @@ public class FrogController : MonoBehaviour, IController
             Velocity = rb.velocity
         };
     }
+    
+    public void SetMode(bool beingReplayed, FrogTimeData _ownDataRef) {
+        // rb.isKinematic = beingReplayed;
+        IsBeingReplayed = beingReplayed;
+        ownDataRef = _ownDataRef;
+        ownDataRef.TimeDataMode = beingReplayed ? TimeDataMode.Replay : TimeDataMode.Record;
+    }
+
 
     public void ApplyTimeData(ObjectTimeData timeData) {
         rb.angularVelocity = timeData.AngularVelocity;
@@ -89,8 +109,9 @@ public class FrogController : MonoBehaviour, IController
         }
     }
 
-    private void Update()
-    {
+    private void Update() {
+        if (IsBeingReplayed) return;
+        
         if(inputDown && IsGrounded())
         {
             charging = true;
@@ -105,9 +126,12 @@ public class FrogController : MonoBehaviour, IController
         inputDown = false;
     }
 
-    private void FixedUpdate()
-    {
-        arrow.transform.localScale = new Vector3(1f, 1f, 0f);
+    private void FixedUpdate() {
+        if (IsBeingReplayed) {
+            arrow.transform.localScale = new Vector3(1f, 1f, 0f);
+            return;
+        }
+        
 
         if (charging)
         {
@@ -162,10 +186,12 @@ public class FrogController : MonoBehaviour, IController
         return false;
     }
 
-    public void Die()
-    {
-        corpseRev = Instantiate(splatFrog, this.transform.position, splatFrog.transform.rotation);
-
+    public void Die() {
+        var pos = transform.position;
+        pos.y = 0.05f;
+        corpseRev = Instantiate(splatFrog, pos, splatFrog.transform.rotation);
         gameObject.SetActive(false);
+        
+        OnGettingRoadKilledCallBack?.Invoke();
     }
 }
