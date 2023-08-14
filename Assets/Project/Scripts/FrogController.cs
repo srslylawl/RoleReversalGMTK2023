@@ -114,7 +114,7 @@ public class FrogController : MonoBehaviour, IController
 
         if ((transform.position - chargeEnd).magnitude > 0.1f)
         {
-            jumpDirection = (transform.position - chargeEnd);
+            jumpDirection = (transform.position - chargeEnd).normalized;
         }
     }
 

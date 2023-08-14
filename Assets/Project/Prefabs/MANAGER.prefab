@@ -162,7 +162,7 @@ Transform:
   m_Children:
   - {fileID: 8682894724895854007}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1312611833420796560
 MonoBehaviour:
@@ -176,6 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7ef676219e3b024c8f3233db02e417b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CarController: {fileID: 0}
   FrogController: {fileID: 0}
   UpdateControllers: 0
 --- !u!114 &3500980617525781295

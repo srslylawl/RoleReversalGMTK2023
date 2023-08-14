@@ -81,6 +81,6 @@ public class InputManager : MonoBehaviour {
 
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(mouseWorldPos, .3f);
+		Gizmos.DrawSphere(mouseWorldPos, .3f);
 	}
 }
