@@ -50,6 +50,12 @@ public class InputManager : MonoBehaviour {
 	}
 
 	private void Update() {
+		//DEBUG
+		if (Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.X) && Input.GetKeyDown(KeyCode.T)) {
+			UIManager.NextLevel();
+		}
+		
+		
 		if (!UpdateControllers) {
 			return;
 		}

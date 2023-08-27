@@ -5559,54 +5559,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainCamParent
       objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_ClearFlags
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: field of view
-      value: 60.000004
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: far clip plane
-      value: 5000
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_TargetTexture
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: near clip plane
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: orthographic size
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_BackGroundColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_BackGroundColor.b
-      value: 0.16329308
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_BackGroundColor.g
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_BackGroundColor.r
-      value: 0.10613209
-      objectReference: {fileID: 0}
-    - target: {fileID: 1807687114150342306, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 4294967295
-      objectReference: {fileID: 0}
     - target: {fileID: 2449562051627143637, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -5651,21 +5603,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4899223125781927811, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5534381604823249903, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5800845021071691824, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 4899223125781927811, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 59339dd6d3b419148b7b2ff14e1e0e47, type: 3}
